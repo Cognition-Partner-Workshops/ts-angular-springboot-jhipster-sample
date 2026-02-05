@@ -18,7 +18,7 @@ public class SqlTestContainersSpringContextCustomizerFactory implements ContextC
 
     private Logger log = LoggerFactory.getLogger(SqlTestContainersSpringContextCustomizerFactory.class);
 
-    private static SqlTestContainer prodTestContainer;
+    private static SqlTestContainer prodTestcontainer;
 
     @Override
     public ContextCustomizer createContextCustomizer(Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
@@ -34,23 +34,23 @@ public class SqlTestContainersSpringContextCustomizerFactory implements ContextC
                 if (null != sqlAnnotation && usingTestProdProfile) {
                     log.debug("detected the EmbeddedSQL annotation on class {}", testClass.getName());
                     log.info("Warming up the sql database");
-                    if (null == prodTestContainer) {
+                    if (null == prodTestcontainer) {
                         try {
                             Class<? extends SqlTestContainer> containerClass = (Class<? extends SqlTestContainer>) Class.forName(
-                                this.getClass().getPackageName() + ".PostgreSqlTestContainer"
+                                this.getClass().getPackageName() + ".DatabaseTestcontainer"
                             );
-                            prodTestContainer = beanFactory.createBean(containerClass);
-                            beanFactory.registerSingleton(containerClass.getName(), prodTestContainer);
+                            prodTestcontainer = beanFactory.createBean(containerClass);
+                            beanFactory.registerSingleton(containerClass.getName(), prodTestcontainer);
                             /**
-                             * ((DefaultListableBeanFactory)beanFactory).registerDisposableBean(containerClass.getName(), prodTestContainer);
+                             * ((DefaultListableBeanFactory)beanFactory).registerDisposableBean(containerClass.getName(), prodTestcontainer);
                              */
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
                     }
-                    testValues = testValues.and("spring.datasource.url=" + prodTestContainer.getTestContainer().getJdbcUrl() + "");
-                    testValues = testValues.and("spring.datasource.username=" + prodTestContainer.getTestContainer().getUsername());
-                    testValues = testValues.and("spring.datasource.password=" + prodTestContainer.getTestContainer().getPassword());
+                    testValues = testValues.and("spring.datasource.url=" + prodTestcontainer.getTestContainer().getJdbcUrl() + "");
+                    testValues = testValues.and("spring.datasource.username=" + prodTestcontainer.getTestContainer().getUsername());
+                    testValues = testValues.and("spring.datasource.password=" + prodTestcontainer.getTestContainer().getPassword());
                 }
                 testValues.applyTo(context);
             }
