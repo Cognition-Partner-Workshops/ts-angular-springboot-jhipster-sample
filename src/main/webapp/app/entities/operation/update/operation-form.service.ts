@@ -35,6 +35,7 @@ type OperationFormGroupContent = {
   date: FormControl<OperationFormRawValue['date']>;
   description: FormControl<OperationFormRawValue['description']>;
   amount: FormControl<OperationFormRawValue['amount']>;
+  paymentType: FormControl<OperationFormRawValue['paymentType']>;
   bankAccount: FormControl<OperationFormRawValue['bankAccount']>;
   labels: FormControl<OperationFormRawValue['labels']>;
 };
@@ -63,6 +64,7 @@ export class OperationFormService {
       amount: new FormControl(operationRawValue.amount, {
         validators: [Validators.required],
       }),
+      paymentType: new FormControl(operationRawValue.paymentType),
       bankAccount: new FormControl(operationRawValue.bankAccount),
       labels: new FormControl(operationRawValue.labels ?? []),
     });

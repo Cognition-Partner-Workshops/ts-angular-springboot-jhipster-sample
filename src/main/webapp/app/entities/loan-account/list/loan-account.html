@@ -1,0 +1,126 @@
+<div>
+  <h2 id="page-heading" data-cy="LoanAccountHeading">
+    <span>Loan Accounts</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-loan-account"
+        [routerLink]="['/loan-account/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Loan Account</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  @if (loanAccounts().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Loan Accounts found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="accountName">
+              <div class="d-flex">
+                <span>Account Name</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="loanAmount">
+              <div class="d-flex">
+                <span>Loan Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="interestRate">
+              <div class="d-flex">
+                <span>Interest Rate (%)</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="termMonths">
+              <div class="d-flex">
+                <span>Term (Months)</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="monthlyPayment">
+              <div class="d-flex">
+                <span>Monthly Payment</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="remainingBalance">
+              <div class="d-flex">
+                <span>Remaining Balance</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (loanAccount of loanAccounts(); track trackId(loanAccount)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/loan-account', loanAccount.id, 'view']">{{ loanAccount.id }}</a>
+              </td>
+              <td>{{ loanAccount.accountName }}</td>
+              <td>{{ loanAccount.loanAmount | number: '1.2-2' }}</td>
+              <td>{{ loanAccount.interestRate | number: '1.2-6' }}</td>
+              <td>{{ loanAccount.termMonths }}</td>
+              <td>{{ loanAccount.monthlyPayment | number: '1.2-2' }}</td>
+              <td>{{ loanAccount.remainingBalance | number: '1.2-2' }}</td>
+              <td>
+                {{ loanAccount.user?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/loan-account', loanAccount.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/loan-account', loanAccount.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(loanAccount)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

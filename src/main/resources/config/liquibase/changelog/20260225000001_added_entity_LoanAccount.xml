@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260225000001-1" author="devin">
+        <createTable tableName="loan_account">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="loan_amount" type="decimal(21,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interest_rate" type="decimal(10,6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="term_months" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="monthly_payment" type="decimal(21,2)"/>
+            <column name="remaining_balance" type="decimal(21,2)"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="loan_account"
+                                 constraintName="fk_loan_account_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,95 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (loanAccount(); as loanAccountRef) {
+      <div>
+        <h2 data-cy="loanAccountDetailsHeading">
+          <span>Loan Account</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.id }}</span>
+          </dd>
+          <dt><span>Account Name</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.accountName }}</span>
+          </dd>
+          <dt><span>Loan Amount</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.loanAmount | number: '1.2-2' }}</span>
+          </dd>
+          <dt><span>Interest Rate (%)</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.interestRate | number: '1.2-6' }}</span>
+          </dd>
+          <dt><span>Term (Months)</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.termMonths }}</span>
+          </dd>
+          <dt><span>Monthly Payment</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.monthlyPayment | number: '1.2-2' }}</span>
+          </dd>
+          <dt><span>Remaining Balance</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.remainingBalance | number: '1.2-2' }}</span>
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ loanAccountRef.user?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/loan-account', loanAccountRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+
+        <button type="button" (click)="toggleAmortization()" class="btn btn-secondary ms-2">
+          <fa-icon icon="calculator" />&nbsp;
+          <span>{{ showAmortization() ? 'Hide' : 'Show' }} Amortization Schedule</span>
+        </button>
+
+        @if (showAmortization() && amortizationSchedule().length > 0) {
+          <div class="mt-4">
+            <h3>Amortization Schedule</h3>
+            <div class="table-responsive">
+              <table class="table table-sm table-striped">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Payment</th>
+                    <th>Principal</th>
+                    <th>Interest</th>
+                    <th>Remaining Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (entry of amortizationSchedule(); track entry.month) {
+                    <tr>
+                      <td>{{ entry.month }}</td>
+                      <td>{{ entry.payment | number: '1.2-2' }}</td>
+                      <td>{{ entry.principal | number: '1.2-2' }}</td>
+                      <td>{{ entry.interest | number: '1.2-2' }}</td>
+                      <td>{{ entry.remainingBalance | number: '1.2-2' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

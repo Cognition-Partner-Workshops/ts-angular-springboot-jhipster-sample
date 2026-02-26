@@ -1,0 +1,146 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-loan-account-heading" data-cy="LoanAccountCreateUpdateHeading">Create or edit a Loan Account</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let accountNameRef = editForm.get('accountName')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_accountName">Account Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="accountName"
+            id="field_accountName"
+            data-cy="accountName"
+            formControlName="accountName"
+          />
+          @if (accountNameRef.invalid && (accountNameRef.dirty || accountNameRef.touched)) {
+            <div>
+              @if (editForm.get('accountName')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let loanAmountRef = editForm.get('loanAmount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_loanAmount">Loan Amount</label>
+          <input
+            type="number"
+            class="form-control"
+            name="loanAmount"
+            id="field_loanAmount"
+            data-cy="loanAmount"
+            formControlName="loanAmount"
+          />
+          @if (loanAmountRef.invalid && (loanAmountRef.dirty || loanAmountRef.touched)) {
+            <div>
+              @if (editForm.get('loanAmount')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('loanAmount')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let interestRateRef = editForm.get('interestRate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_interestRate">Interest Rate (% annual)</label>
+          <input
+            type="number"
+            class="form-control"
+            name="interestRate"
+            id="field_interestRate"
+            data-cy="interestRate"
+            formControlName="interestRate"
+            step="0.01"
+          />
+          @if (interestRateRef.invalid && (interestRateRef.dirty || interestRateRef.touched)) {
+            <div>
+              @if (editForm.get('interestRate')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('interestRate')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let termMonthsRef = editForm.get('termMonths')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_termMonths">Term (Months)</label>
+          <input
+            type="number"
+            class="form-control"
+            name="termMonths"
+            id="field_termMonths"
+            data-cy="termMonths"
+            formControlName="termMonths"
+          />
+          @if (termMonthsRef.invalid && (termMonthsRef.dirty || termMonthsRef.touched)) {
+            <div>
+              @if (editForm.get('termMonths')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('termMonths')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 1.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_remainingBalance">Remaining Balance</label>
+          <input
+            type="number"
+            class="form-control"
+            name="remainingBalance"
+            id="field_remainingBalance"
+            data-cy="remainingBalance"
+            formControlName="remainingBalance"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection(); track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

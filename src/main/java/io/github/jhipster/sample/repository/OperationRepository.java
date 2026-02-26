@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.repository;
 
 import io.github.jhipster.sample.domain.Operation;
+import io.github.jhipster.sample.domain.enumeration.PaymentType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -40,4 +41,10 @@ public interface OperationRepository extends OperationRepositoryWithBagRelations
 
     @Query("select operation from Operation operation left join fetch operation.bankAccount where operation.id =:id")
     Optional<Operation> findOneWithToOneRelationships(@Param("id") Long id);
+
+    @Query(
+        value = "select operation from Operation operation left join fetch operation.bankAccount where operation.paymentType = :paymentType",
+        countQuery = "select count(operation) from Operation operation where operation.paymentType = :paymentType"
+    )
+    Page<Operation> findAllByPaymentType(@Param("paymentType") PaymentType paymentType, Pageable pageable);
 }

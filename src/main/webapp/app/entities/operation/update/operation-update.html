@@ -82,6 +82,17 @@
         </div>
 
         <div class="mb-3">
+          <label class="form-label" for="field_paymentType">Payment Type</label>
+          <select class="form-control" id="field_paymentType" data-cy="paymentType" name="paymentType" formControlName="paymentType">
+            <option [ngValue]="null"></option>
+            <option value="PRINCIPAL">PRINCIPAL</option>
+            <option value="INTEREST">INTEREST</option>
+            <option value="FEE">FEE</option>
+            <option value="OVERPAYMENT">OVERPAYMENT</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
           <label class="form-label" for="field_bankAccount" jhiTranslate="jhipsterSampleApplicationApp.operation.bankAccount"
             >Bank Account</label
           >

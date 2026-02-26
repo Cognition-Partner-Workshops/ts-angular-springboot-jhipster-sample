@@ -24,6 +24,18 @@
 
   <jhi-alert />
 
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label class="form-label" for="paymentTypeFilter">Filter by Payment Type</label>
+      <select class="form-select" id="paymentTypeFilter" (change)="onPaymentTypeFilterChange($any($event.target).value)">
+        <option value="">All</option>
+        @for (pt of paymentTypes; track pt) {
+          <option [value]="pt">{{ pt }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
   @if (operations().length === 0) {
     <div class="alert alert-warning" id="no-result">
       <span jhiTranslate="jhipsterSampleApplicationApp.operation.home.notFound">No Operations found</span>
@@ -61,6 +73,12 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="paymentType">
+              <div class="d-flex">
+                <span>Payment Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" jhiSortBy="bankAccount.name">
               <div class="d-flex">
                 <span jhiTranslate="jhipsterSampleApplicationApp.operation.bankAccount">Bank Account</span>
@@ -79,6 +97,7 @@
               <td>{{ operation.date | formatMediumDatetime }}</td>
               <td>{{ operation.description }}</td>
               <td>{{ operation.amount }}</td>
+              <td>{{ operation.paymentType }}</td>
               <td>
                 @if (operation.bankAccount) {
                   <div>

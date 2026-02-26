@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.Operation;
+import io.github.jhipster.sample.domain.enumeration.PaymentType;
 import io.github.jhipster.sample.repository.OperationRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -132,6 +133,7 @@ public class OperationResource {
                 updateIfPresent(existingOperation::setDate, operation.getDate());
                 updateIfPresent(existingOperation::setDescription, operation.getDescription());
                 updateIfPresent(existingOperation::setAmount, operation.getAmount());
+                updateIfPresent(existingOperation::setPaymentType, operation.getPaymentType());
 
                 return existingOperation;
             })
@@ -153,11 +155,14 @@ public class OperationResource {
     @GetMapping("")
     public ResponseEntity<List<Operation>> getAllOperations(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload,
+        @RequestParam(name = "paymentType", required = false) PaymentType paymentType
     ) {
         LOG.debug("REST request to get a page of Operations");
         Page<Operation> page;
-        if (eagerload) {
+        if (paymentType != null) {
+            page = operationRepository.findAllByPaymentType(paymentType, pageable);
+        } else if (eagerload) {
             page = operationRepository.findAllWithEagerRelationships(pageable);
         } else {
             page = operationRepository.findAll(pageable);
