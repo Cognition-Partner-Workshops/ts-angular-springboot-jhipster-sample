@@ -18,7 +18,7 @@ import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { OperationDeleteDialog } from '../delete/operation-delete-dialog';
-import { IOperation } from '../operation.model';
+import { IOperation, PaymentType } from '../operation.model';
 import { EntityArrayResponseType, OperationService } from '../service/operation.service';
 
 @Component({
@@ -45,6 +45,8 @@ export class Operation implements OnInit {
   isLoading = signal(false);
 
   sortState = sortStateSignal({});
+  paymentTypeFilter = signal<PaymentType | ''>('');
+  paymentTypes: PaymentType[] = ['PRINCIPAL', 'INTEREST', 'FEE', 'OVERPAYMENT'];
 
   itemsPerPage = signal(ITEMS_PER_PAGE);
   links: WritableSignal<Record<string, undefined | Record<string, string | undefined>>> = signal({});
@@ -94,6 +96,12 @@ export class Operation implements OnInit {
     this.queryBackend().subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
   }
 
+  onPaymentTypeFilterChange(value: string): void {
+    this.paymentTypeFilter.set(value as PaymentType | '');
+    this.reset();
+    this.load();
+  }
+
   navigateToWithComponentValues(event: SortState): void {
     this.handleNavigation(event);
   }
@@ -139,6 +147,10 @@ export class Operation implements OnInit {
       size: this.itemsPerPage(),
       eagerload: true,
     };
+    const filterValue = this.paymentTypeFilter();
+    if (filterValue) {
+      queryObject.paymentType = filterValue;
+    }
     if (this.hasMorePage()) {
       Object.assign(queryObject, this.links().next);
     } else if (this.isFirstFetch()) {

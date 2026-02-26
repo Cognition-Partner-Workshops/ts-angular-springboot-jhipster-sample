@@ -27,6 +27,10 @@
           <dd>
             <span>{{ operationRef.amount }}</span>
           </dd>
+          <dt><span>Payment Type</span></dt>
+          <dd>
+            <span>{{ operationRef.paymentType }}</span>
+          </dd>
           <dt><span jhiTranslate="jhipsterSampleApplicationApp.operation.bankAccount">Bank Account</span></dt>
           <dd>
             @if (operation()!.bankAccount) {

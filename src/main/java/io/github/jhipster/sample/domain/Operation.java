@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.jhipster.sample.domain.enumeration.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serial;
@@ -40,6 +41,10 @@ public class Operation implements Serializable {
     @NotNull
     @Column(name = "amount", precision = 21, scale = 2, nullable = false)
     private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type")
+    private PaymentType paymentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "user", "operations" }, allowSetters = true)
@@ -109,6 +114,19 @@ public class Operation implements Serializable {
         this.amount = amount;
     }
 
+    public PaymentType getPaymentType() {
+        return this.paymentType;
+    }
+
+    public Operation paymentType(PaymentType paymentType) {
+        this.setPaymentType(paymentType);
+        return this;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+    }
+
     public BankAccount getBankAccount() {
         return this.bankAccount;
     }
@@ -172,6 +190,7 @@ public class Operation implements Serializable {
             ", date='" + getDate() + "'" +
             ", description='" + getDescription() + "'" +
             ", amount=" + getAmount() +
+            ", paymentType='" + getPaymentType() + "'" +
             "}";
     }
 }
