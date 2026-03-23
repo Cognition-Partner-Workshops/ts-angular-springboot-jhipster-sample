@@ -44,7 +44,7 @@ groups:
           summary: 'Application instance is down'
 
       - alert: HighInvalidTokenRate
-        expr: rate(security_authentication_invalid_tokens_total[5m]) > 1
+        expr: rate(security_authentication_invalid_tokens_errors_total[5m]) > 1
         for: 5m
         labels:
           severity: warning

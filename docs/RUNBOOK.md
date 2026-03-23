@@ -250,7 +250,7 @@ Pre-existing JHipster JVM dashboard with detailed JVM internals.
 | JvmHeapPressure          | `jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85`     | 5m       | Warning  | Heap usage above 85%                        |
 | HikariPoolExhaustion     | `hikaricp_connections_pending > 5`                                                   | 5m       | Critical | More than 5 threads waiting for connections |
 | ApplicationDown          | `up == 0`                                                                            | 1m       | Critical | Application instance is unreachable         |
-| HighInvalidTokenRate     | `rate(security_authentication_invalid_tokens_total[5m]) > 1`                         | 5m       | Warning  | Possible token-based attack                 |
+| HighInvalidTokenRate     | `rate(security_authentication_invalid_tokens_errors_total[5m]) > 1`                  | 5m       | Warning  | Possible token-based attack                 |
 | HighLoginFailureRate     | `failure / (success + failure) > 0.3`                                                | 10m      | Warning  | Login failure rate above 30%                |
 
 ### Notification Channels

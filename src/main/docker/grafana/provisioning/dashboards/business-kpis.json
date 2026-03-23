@@ -177,7 +177,7 @@
       "type": "timeseries",
       "targets": [
         {
-          "expr": "rate(security_authentication_invalid_tokens_total[5m])",
+          "expr": "rate(security_authentication_invalid_tokens_errors_total[5m])",
           "legendFormat": "Invalid Tokens/s"
         }
       ]

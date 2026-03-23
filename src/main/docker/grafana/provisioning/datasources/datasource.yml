@@ -12,6 +12,7 @@ datasources:
   - name: Prometheus
     # <string, required> datasource type. Required
     type: prometheus
+    uid: prometheus
     # <string, required> access mode. direct or proxy. Required
     access: proxy
     # <int> org id. will default to orgId 1 if not specified
@@ -50,6 +51,7 @@ datasources:
     editable: true
   - name: Tempo
     type: tempo
+    uid: tempo
     access: proxy
     orgId: 1
     url: http://localhost:3200
