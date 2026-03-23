@@ -23,10 +23,7 @@
         "name": "application",
         "type": "query",
         "label": "Application",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(bank_account_created_total, application)",
         "refresh": 2,
         "includeAll": false,
@@ -38,10 +35,7 @@
         "name": "instance",
         "type": "query",
         "label": "Instance",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(bank_account_created_total{application=\"$application\"}, instance)",
         "refresh": 2,
         "includeAll": true,
@@ -58,10 +52,7 @@
       "description": "Rate of bank account creations per second",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "rate(bank_account_created_total{application=\"$application\", instance=~\"$instance\"}[5m])",
@@ -98,10 +89,7 @@
       "description": "Rate of bank account deletions per second",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "rate(bank_account_deleted_total{application=\"$application\", instance=~\"$instance\"}[5m])",
@@ -138,10 +126,7 @@
       "description": "Current number of active bank accounts",
       "type": "stat",
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "bank_account_active_count{application=\"$application\", instance=~\"$instance\"}",
@@ -177,10 +162,7 @@
       "description": "Rate of financial operations per second, grouped by DEBIT/CREDIT",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(rate(operation_executed_total{application=\"$application\", instance=~\"$instance\"}[5m])) by (type)",
@@ -225,10 +207,7 @@
       "description": "Distribution of operation amounts — p50, p95, p99 percentiles",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "histogram_quantile(0.50, sum(rate(operation_amount_bucket{application=\"$application\", instance=~\"$instance\"}[5m])) by (le, type))",
@@ -274,10 +253,7 @@
       "description": "95th percentile of bank account creation duration",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "histogram_quantile(0.95, sum(rate(bank_account_creation_duration_seconds_bucket{application=\"$application\", instance=~\"$instance\"}[5m])) by (le))",
@@ -314,10 +290,7 @@
       "description": "Rate of invalid authentication tokens, grouped by cause",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(rate(security_authentication_invalid_tokens_total{application=\"$application\", instance=~\"$instance\"}[5m])) by (cause)",

@@ -23,10 +23,7 @@
         "name": "application",
         "type": "query",
         "label": "Application",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(http_server_requests_seconds_count, application)",
         "refresh": 2,
         "includeAll": false,
@@ -38,10 +35,7 @@
         "name": "instance",
         "type": "query",
         "label": "Instance",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(http_server_requests_seconds_count{application=\"$application\"}, instance)",
         "refresh": 2,
         "includeAll": true,
@@ -58,10 +52,7 @@
       "description": "Rate of HTTP requests per second, grouped by URI and method",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\", instance=~\"$instance\"}[5m])) by (uri, method)",
@@ -97,10 +88,7 @@
       "description": "Rate of HTTP 5xx server errors per second, grouped by URI",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\", instance=~\"$instance\", status=~\"5..\"}[5m])) by (uri)",
@@ -145,10 +133,7 @@
       "description": "HTTP request duration percentiles (50th, 95th, 99th)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{application=\"$application\", instance=~\"$instance\"}[5m])) by (le))",
@@ -207,10 +192,7 @@
       "description": "Total number of HTTP requests in the last hour",
       "type": "stat",
       "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(increase(http_server_requests_seconds_count{application=\"$application\", instance=~\"$instance\"}[1h]))",
@@ -246,10 +228,7 @@
       "description": "Percentage of HTTP 5xx errors relative to all requests",
       "type": "gauge",
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\", instance=~\"$instance\", status=~\"5..\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"$application\", instance=~\"$instance\"}[5m])) * 100",
@@ -290,10 +269,7 @@
       "description": "Heatmap of HTTP request durations over time",
       "type": "heatmap",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(increase(http_server_requests_seconds_bucket{application=\"$application\", instance=~\"$instance\"}[5m])) by (le)",

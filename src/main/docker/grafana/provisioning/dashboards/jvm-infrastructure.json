@@ -23,10 +23,7 @@
         "name": "application",
         "type": "query",
         "label": "Application",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(jvm_memory_used_bytes, application)",
         "refresh": 2,
         "includeAll": false,
@@ -38,10 +35,7 @@
         "name": "instance",
         "type": "query",
         "label": "Instance",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
-        },
+        "datasource": "Prometheus",
         "query": "label_values(jvm_memory_used_bytes{application=\"$application\"}, instance)",
         "refresh": 2,
         "includeAll": true,
@@ -58,10 +52,7 @@
       "description": "JVM heap memory — used, committed, and max",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=~\"$instance\", area=\"heap\"}) by (instance)",
@@ -128,10 +119,7 @@
       "description": "Average garbage collection pause duration",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{application=\"$application\", instance=~\"$instance\"}[5m]) / rate(jvm_gc_pause_seconds_count{application=\"$application\", instance=~\"$instance\"}[5m])",
@@ -168,10 +156,7 @@
       "description": "Rate of garbage collection pauses per second",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_count{application=\"$application\", instance=~\"$instance\"}[5m])",
@@ -208,10 +193,7 @@
       "description": "HikariCP connection pool — active, idle, and pending connections",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "hikaricp_connections_active{application=\"$application\", instance=~\"$instance\"}",
@@ -270,10 +252,7 @@
       "description": "JVM thread counts grouped by state",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "jvm_threads_states_threads{application=\"$application\", instance=~\"$instance\"}",
@@ -310,10 +289,7 @@
       "description": "Process and system CPU usage (0-1 scale)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "process_cpu_usage{application=\"$application\", instance=~\"$instance\"}",
@@ -365,10 +341,7 @@
       "description": "Rate of log events per second, grouped by log level",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
+      "datasource": "Prometheus",
       "targets": [
         {
           "expr": "rate(logback_events_total{application=\"$application\", instance=~\"$instance\"}[5m])",
