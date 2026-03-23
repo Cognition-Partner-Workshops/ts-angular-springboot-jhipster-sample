@@ -1,0 +1,335 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Enhanced JVM dashboard with HikariCP connection pool and Ehcache metrics",
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "HikariCP Connection Pool",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 20, "lineWidth": 2 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "id": 101,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HikariCP Active vs Idle Connections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active{application=\"$application\"}",
+          "legendFormat": "Active",
+          "refId": "A"
+        },
+        {
+          "expr": "hikaricp_connections_idle{application=\"$application\"}",
+          "legendFormat": "Idle",
+          "refId": "B"
+        },
+        {
+          "expr": "hikaricp_connections{application=\"$application\"}",
+          "legendFormat": "Total",
+          "refId": "C"
+        },
+        {
+          "expr": "hikaricp_connections_max{application=\"$application\"}",
+          "legendFormat": "Max",
+          "refId": "D"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "id": 102,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HikariCP Pending Threads",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_pending{application=\"$application\"}",
+          "legendFormat": "Pending Threads",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
+      "id": 103,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HikariCP Connection Acquisition Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(hikaricp_connections_acquire_seconds_sum{application=\"$application\"}[5m]) / rate(hikaricp_connections_acquire_seconds_count{application=\"$application\"}[5m])",
+          "legendFormat": "Avg Acquire Time",
+          "refId": "A"
+        },
+        {
+          "expr": "hikaricp_connections_acquire_seconds_max{application=\"$application\"}",
+          "legendFormat": "Max Acquire Time",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
+      "id": 104,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HikariCP Connection Usage Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(hikaricp_connections_usage_seconds_sum{application=\"$application\"}[5m]) / rate(hikaricp_connections_usage_seconds_count{application=\"$application\"}[5m])",
+          "legendFormat": "Avg Usage Time",
+          "refId": "A"
+        },
+        {
+          "expr": "hikaricp_connections_usage_seconds_max{application=\"$application\"}",
+          "legendFormat": "Max Usage Time",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "id": 105,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "HikariCP Connection Creation/Timeout Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(hikaricp_connections_creation_seconds_count{application=\"$application\"}[5m])",
+          "legendFormat": "Connections Created/s",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(hikaricp_connections_timeout_total{application=\"$application\"}[5m])",
+          "legendFormat": "Timeouts/s",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "id": 200,
+      "panels": [],
+      "title": "Ehcache",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 20, "lineWidth": 2 },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+      "id": 201,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Ehcache Hit Rate (by cache)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(cache_gets_total{application=\"$application\", result=\"hit\"}[5m])",
+          "legendFormat": "{{cache}} - hits/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 20, "lineWidth": 2 },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+      "id": 202,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Ehcache Miss Rate (by cache)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(cache_gets_total{application=\"$application\", result=\"miss\"}[5m])",
+          "legendFormat": "{{cache}} - misses/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 34 },
+      "id": 203,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Ehcache Hit Ratio (by cache)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(cache_gets_total{application=\"$application\", result=\"hit\"}[5m]) / (rate(cache_gets_total{application=\"$application\", result=\"hit\"}[5m]) + rate(cache_gets_total{application=\"$application\", result=\"miss\"}[5m]))",
+          "legendFormat": "{{cache}} - hit ratio",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 34 },
+      "id": 204,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Ehcache Size (entries per cache)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "cache_size{application=\"$application\"}",
+          "legendFormat": "{{cache}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisBorderShow": false, "fillOpacity": 15, "lineWidth": 2 },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 42 },
+      "id": 205,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Ehcache Puts & Evictions Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(cache_puts_total{application=\"$application\"}[5m])",
+          "legendFormat": "{{cache}} - puts/s",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(cache_evictions_total{application=\"$application\"}[5m])",
+          "legendFormat": "{{cache}} - evictions/s",
+          "refId": "B"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["jhipster", "jvm", "hikari", "ehcache"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(jvm_memory_used_bytes, application)",
+        "hide": 0,
+        "includeAll": false,
+        "name": "application",
+        "query": "label_values(jvm_memory_used_bytes, application)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-30m", "to": "now" },
+  "title": "JVM Enhanced (Hikari & Ehcache)",
+  "uid": "jvm-enhanced",
+  "version": 1
+}

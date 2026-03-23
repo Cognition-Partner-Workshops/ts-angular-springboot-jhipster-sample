@@ -23,7 +23,16 @@ management:
   prometheus:
     metrics:
       export:
-        enabled: false
+        enabled: true
+        step: 60
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 spring:
   devtools:
@@ -106,7 +115,7 @@ jhipster:
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://my-server-url-to-change # Modify according to your server's URL
   logging:
-    use-json-format: false # By default, logs are not in Json format
+    use-json-format: true # Enable structured JSON logging in production
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false
       host: localhost

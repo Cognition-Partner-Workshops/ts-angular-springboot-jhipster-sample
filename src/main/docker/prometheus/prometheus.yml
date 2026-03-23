@@ -9,6 +9,10 @@ global:
   external_labels:
     monitor: 'jhipster'
 
+# Load alert rules from the following files
+rule_files:
+  - 'alerts.yml'
+
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:

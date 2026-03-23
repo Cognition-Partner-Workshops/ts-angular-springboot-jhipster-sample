@@ -65,10 +65,42 @@
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
     <!-- jhipster-needle-logback-add-log - JHipster will add a new log with level -->
 
+    <!-- Structured JSON logging appender for prod profile -->
+    <springProfile name="prod">
+        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdcKeyName>traceId</includeMdcKeyName>
+                <includeMdcKeyName>spanId</includeMdcKeyName>
+                <includeMdcKeyName>correlationId</includeMdcKeyName>
+                <includeMdcKeyName>requestId</includeMdcKeyName>
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <thread>thread</thread>
+                    <logger>logger</logger>
+                    <level>level</level>
+                    <message>message</message>
+                    <stackTrace>stack_trace</stackTrace>
+                </fieldNames>
+                <customFields>{"service":"jhipsterSampleApplication"}</customFields>
+            </encoder>
+        </appender>
+    </springProfile>
+
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
-    <root level="${log.level}">
-        <appender-ref ref="CONSOLE" />
-    </root>
+
+    <!-- Dev profile: plain text console logging -->
+    <springProfile name="dev | default">
+        <root level="${log.level}">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <!-- Prod profile: structured JSON logging with traceId/spanId -->
+    <springProfile name="prod">
+        <root level="${log.level}">
+            <appender-ref ref="JSON_CONSOLE" />
+        </root>
+    </springProfile>
 
     <!-- Prevent logback from outputting its own status -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>

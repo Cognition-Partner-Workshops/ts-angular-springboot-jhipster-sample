@@ -1,0 +1,79 @@
+groups:
+  - name: jhipster-application-alerts
+    rules:
+      # High error rate: >5% of requests returning 5xx over 5 minutes
+      - alert: HighErrorRate
+        expr: >
+          (
+            sum(rate(http_server_requests_seconds_count{application="jhipsterSampleApplication", status=~"5.."}[5m]))
+            /
+            sum(rate(http_server_requests_seconds_count{application="jhipsterSampleApplication"}[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'High HTTP error rate detected'
+          description: 'More than 5% of requests are returning 5xx errors over the last 5 minutes. Current value: {{ $value | humanizePercentage }}'
+          runbook_url: 'docs/RUNBOOK.md#high-error-rate'
+
+      # High latency: P95 response time >1s over 5 minutes
+      - alert: HighLatency
+        expr: >
+          histogram_quantile(0.95,
+            sum(rate(http_server_requests_seconds_bucket{application="jhipsterSampleApplication"}[5m])) by (le)
+          ) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High response latency detected'
+          description: 'P95 response time exceeds 1 second over the last 5 minutes. Current value: {{ $value | humanizeDuration }}'
+          runbook_url: 'docs/RUNBOOK.md#high-latency'
+
+      # Low total balance: aggregate balance below threshold
+      - alert: LowTotalBalance
+        expr: >
+          business_accounts_total_balance_currency{application="jhipsterSampleApplication"} < 100
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Total balance across all accounts is critically low'
+          description: 'Total balance has been below 100 for 10 minutes. Current value: {{ $value }}'
+          runbook_url: 'docs/RUNBOOK.md#low-total-balance'
+
+      # HikariCP pool exhaustion: pending threads > 0 for 5 minutes
+      - alert: HikariPoolExhaustion
+        expr: >
+          hikaricp_connections_pending{application="jhipsterSampleApplication"} > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'HikariCP connection pool exhaustion detected'
+          description: 'Threads have been waiting for database connections for over 5 minutes. Pending threads: {{ $value }}'
+          runbook_url: 'docs/RUNBOOK.md#hikari-pool-exhaustion'
+
+      # HikariCP connection timeouts increasing
+      - alert: HikariConnectionTimeouts
+        expr: >
+          rate(hikaricp_connections_timeout_total{application="jhipsterSampleApplication"}[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'HikariCP connection timeouts detected'
+          description: 'Database connection acquisition timeouts are occurring. Rate: {{ $value }}/s'
+          runbook_url: 'docs/RUNBOOK.md#hikari-pool-exhaustion'
+
+      # Application down
+      - alert: ApplicationDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Application is down'
+          description: 'The JHipster application has been unreachable for over 1 minute.'
+          runbook_url: 'docs/RUNBOOK.md#application-down'

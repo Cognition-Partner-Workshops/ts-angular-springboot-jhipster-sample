@@ -1,5 +1,6 @@
 package io.github.jhipster.sample.web.rest;
 
+import io.github.jhipster.sample.config.ObservabilityConfiguration;
 import io.github.jhipster.sample.domain.BankAccount;
 import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
@@ -36,9 +37,11 @@ public class BankAccountResource {
     private String applicationName;
 
     private final BankAccountRepository bankAccountRepository;
+    private final ObservabilityConfiguration observability;
 
-    public BankAccountResource(BankAccountRepository bankAccountRepository) {
+    public BankAccountResource(BankAccountRepository bankAccountRepository, ObservabilityConfiguration observability) {
         this.bankAccountRepository = bankAccountRepository;
+        this.observability = observability;
     }
 
     /**
@@ -55,6 +58,7 @@ public class BankAccountResource {
             throw new BadRequestAlertException("A new bankAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
         bankAccount = bankAccountRepository.save(bankAccount);
+        observability.getAccountCreationCounter().increment();
         return ResponseEntity.created(new URI("/api/bank-accounts/" + bankAccount.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
             .body(bankAccount);
