@@ -169,8 +169,8 @@
           "color": { "mode": "thresholds" },
           "thresholds": {
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 0 }
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
             ]
           }
         }

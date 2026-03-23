@@ -72,7 +72,7 @@ public class AuthenticateController {
             httpHeaders.setBearerAuth(jwt);
             businessMetricsService.incrementLoginSuccess();
             return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (org.springframework.security.core.AuthenticationException e) {
             businessMetricsService.incrementLoginFailure();
             throw e;
         }
