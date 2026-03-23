@@ -3,12 +3,14 @@ package io.github.jhipster.sample.service;
 import io.github.jhipster.sample.config.Constants;
 import io.github.jhipster.sample.domain.Authority;
 import io.github.jhipster.sample.domain.User;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.repository.AuthorityRepository;
 import io.github.jhipster.sample.repository.UserRepository;
 import io.github.jhipster.sample.security.AuthoritiesConstants;
 import io.github.jhipster.sample.security.SecurityUtils;
 import io.github.jhipster.sample.service.dto.AdminUserDTO;
 import io.github.jhipster.sample.service.dto.UserDTO;
+import io.micrometer.observation.annotation.Observed;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -41,18 +43,23 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
+    private final BusinessMetricsService businessMetricsService;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthorityRepository authorityRepository,
-        CacheManager cacheManager
+        CacheManager cacheManager,
+        BusinessMetricsService businessMetricsService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.businessMetricsService = businessMetricsService;
     }
 
+    @Observed(name = "user.activate", contextualName = "activating-user")
     public Optional<User> activateRegistration(String key) {
         LOG.debug("Activating user for activation key {}", key);
         return userRepository
@@ -63,6 +70,7 @@ public class UserService {
                 user.setActivationKey(null);
                 this.clearUserCaches(user);
                 LOG.debug("Activated user: {}", user);
+                businessMetricsService.incrementUserActivated();
                 return user;
             });
     }
@@ -93,6 +101,7 @@ public class UserService {
             });
     }
 
+    @Observed(name = "user.register", contextualName = "registering-user")
     public User registerUser(AdminUserDTO userDTO, String password) {
         userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
@@ -131,6 +140,7 @@ public class UserService {
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
+        businessMetricsService.incrementUserRegistered();
         LOG.debug("Created Information for User: {}", newUser);
         return newUser;
     }

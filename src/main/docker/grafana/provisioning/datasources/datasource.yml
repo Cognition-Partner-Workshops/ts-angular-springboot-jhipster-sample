@@ -48,3 +48,16 @@ datasources:
     version: 1
     # <bool> allow users to edit datasources from the UI.
     editable: true
+  - name: Tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    url: http://localhost:3200
+    isDefault: false
+    version: 1
+    editable: true
+    jsonData:
+      tracesToMetrics:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true

@@ -1,8 +1,10 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.BankAccount;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -37,8 +39,11 @@ public class BankAccountResource {
 
     private final BankAccountRepository bankAccountRepository;
 
-    public BankAccountResource(BankAccountRepository bankAccountRepository) {
+    private final BusinessMetricsService businessMetricsService;
+
+    public BankAccountResource(BankAccountRepository bankAccountRepository, BusinessMetricsService businessMetricsService) {
         this.bankAccountRepository = bankAccountRepository;
+        this.businessMetricsService = businessMetricsService;
     }
 
     /**
@@ -49,12 +54,14 @@ public class BankAccountResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @Observed(name = "bank-account.create", contextualName = "creating-bank-account")
     public ResponseEntity<BankAccount> createBankAccount(@Valid @RequestBody BankAccount bankAccount) throws URISyntaxException {
-        LOG.debug("REST request to save BankAccount : {}", bankAccount);
+        LOG.info("REST request to save BankAccount : {}", bankAccount);
         if (bankAccount.getId() != null) {
             throw new BadRequestAlertException("A new bankAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
         bankAccount = bankAccountRepository.save(bankAccount);
+        businessMetricsService.incrementBankAccountCreated();
         return ResponseEntity.created(new URI("/api/bank-accounts/" + bankAccount.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
             .body(bankAccount);
@@ -71,11 +78,12 @@ public class BankAccountResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @Observed(name = "bank-account.update", contextualName = "updating-bank-account")
     public ResponseEntity<BankAccount> updateBankAccount(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody BankAccount bankAccount
     ) throws URISyntaxException {
-        LOG.debug("REST request to update BankAccount : {}, {}", id, bankAccount);
+        LOG.info("REST request to update BankAccount : {}, {}", id, bankAccount);
         if (bankAccount.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -88,6 +96,7 @@ public class BankAccountResource {
         }
 
         bankAccount = bankAccountRepository.save(bankAccount);
+        businessMetricsService.incrementBankAccountUpdated();
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
             .body(bankAccount);
@@ -175,9 +184,11 @@ public class BankAccountResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @Observed(name = "bank-account.delete", contextualName = "deleting-bank-account")
     public ResponseEntity<Void> deleteBankAccount(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete BankAccount : {}", id);
+        LOG.info("REST request to delete BankAccount : {}", id);
         bankAccountRepository.deleteById(id);
+        businessMetricsService.incrementBankAccountDeleted();
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();

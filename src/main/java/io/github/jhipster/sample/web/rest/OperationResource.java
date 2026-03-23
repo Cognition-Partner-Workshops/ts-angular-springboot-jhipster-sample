@@ -1,8 +1,10 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.Operation;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.repository.OperationRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
@@ -42,8 +44,11 @@ public class OperationResource {
 
     private final OperationRepository operationRepository;
 
-    public OperationResource(OperationRepository operationRepository) {
+    private final BusinessMetricsService businessMetricsService;
+
+    public OperationResource(OperationRepository operationRepository, BusinessMetricsService businessMetricsService) {
         this.operationRepository = operationRepository;
+        this.businessMetricsService = businessMetricsService;
     }
 
     /**
@@ -54,12 +59,15 @@ public class OperationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @Observed(name = "operation.create", contextualName = "creating-operation")
     public ResponseEntity<Operation> createOperation(@Valid @RequestBody Operation operation) throws URISyntaxException {
-        LOG.debug("REST request to save Operation : {}", operation);
+        LOG.info("REST request to save Operation : {}", operation);
         if (operation.getId() != null) {
             throw new BadRequestAlertException("A new operation cannot already have an ID", ENTITY_NAME, "idexists");
         }
         operation = operationRepository.save(operation);
+        businessMetricsService.incrementOperationCreated();
+        businessMetricsService.recordOperationAmount(operation.getAmount());
         return ResponseEntity.created(new URI("/api/operations/" + operation.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, operation.getId().toString()))
             .body(operation);
@@ -80,7 +88,7 @@ public class OperationResource {
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Operation operation
     ) throws URISyntaxException {
-        LOG.debug("REST request to update Operation : {}, {}", id, operation);
+        LOG.info("REST request to update Operation : {}, {}", id, operation);
         if (operation.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -187,7 +195,7 @@ public class OperationResource {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOperation(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete Operation : {}", id);
+        LOG.info("REST request to delete Operation : {}", id);
         operationRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

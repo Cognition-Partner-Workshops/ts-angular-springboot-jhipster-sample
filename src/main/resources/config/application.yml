@@ -68,6 +68,9 @@ management:
       export:
         enabled: true
         step: 60
+  tracing:
+    sampling:
+      probability: 1.0
   observations:
     key-values:
       application: ${spring.application.name}

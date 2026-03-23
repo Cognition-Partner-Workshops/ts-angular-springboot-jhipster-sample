@@ -14,6 +14,24 @@ services:
     # On MacOS, remove next line and replace localhost by host.docker.internal in prometheus/prometheus.yml and
     # grafana/provisioning/datasources/datasource.yml
     network_mode: 'host' # to test locally running service
+  tempo:
+    image: grafana/tempo:latest
+    command: ['-config.file=/etc/tempo.yaml']
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo.yaml
+    ports:
+      - 127.0.0.1:3200:3200
+      - 127.0.0.1:4318:4318
+    network_mode: 'host'
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - 127.0.0.1:9093:9093
+    network_mode: 'host'
   grafana:
     image: grafana/grafana:12.3.2
     volumes:

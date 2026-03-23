@@ -50,7 +50,7 @@ public class LabelResource {
      */
     @PostMapping("")
     public ResponseEntity<Label> createLabel(@Valid @RequestBody Label label) throws URISyntaxException {
-        LOG.debug("REST request to save Label : {}", label);
+        LOG.info("REST request to save Label : {}", label);
         if (label.getId() != null) {
             throw new BadRequestAlertException("A new label cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -73,7 +73,7 @@ public class LabelResource {
     @PutMapping("/{id}")
     public ResponseEntity<Label> updateLabel(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Label label)
         throws URISyntaxException {
-        LOG.debug("REST request to update Label : {}, {}", id, label);
+        LOG.info("REST request to update Label : {}, {}", id, label);
         if (label.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -166,7 +166,7 @@ public class LabelResource {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLabel(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete Label : {}", id);
+        LOG.info("REST request to delete Label : {}", id);
         labelRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

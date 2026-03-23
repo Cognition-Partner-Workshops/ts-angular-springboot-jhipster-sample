@@ -1,0 +1,195 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Bank Accounts Created Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_bank_account_created_total[5m])",
+          "legendFormat": "Created/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "title": "Bank Accounts Updated Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_bank_account_updated_total[5m])",
+          "legendFormat": "Updated/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "title": "Bank Accounts Deleted Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_bank_account_deleted_total[5m])",
+          "legendFormat": "Deleted/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 4,
+      "title": "Operations Created Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_operation_created_total[5m])",
+          "legendFormat": "Operations Created/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 5,
+      "title": "Operation Amount Distribution",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "business_operation_amount_sum",
+          "legendFormat": "Total Amount"
+        },
+        {
+          "expr": "business_operation_amount_count",
+          "legendFormat": "Count"
+        },
+        {
+          "expr": "business_operation_amount_max",
+          "legendFormat": "Max Amount"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "id": 6,
+      "title": "User Registrations Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_user_registered_total[5m])",
+          "legendFormat": "Registrations/s"
+        },
+        {
+          "expr": "rate(business_user_activated_total[5m])",
+          "legendFormat": "Activations/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "id": 7,
+      "title": "Login Success / Failure Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(business_user_login_success_total[5m])",
+          "legendFormat": "Login Success/s"
+        },
+        {
+          "expr": "rate(business_user_login_failure_total[5m])",
+          "legendFormat": "Login Failure/s"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+      "id": 8,
+      "title": "Invalid Authentication Tokens",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(security_authentication_invalid_tokens_total[5m])",
+          "legendFormat": "Invalid Tokens/s"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["jhipster", "business"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Business KPIs",
+  "uid": "business-kpis",
+  "version": 1
+}

@@ -13,19 +13,24 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
-    <!--
-    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+    <!-- Production JSON logging with LogstashEncoder -->
+    <springProfile name="prod">
+        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdcKeyName>correlationId</includeMdcKeyName>
+                <includeMdcKeyName>userId</includeMdcKeyName>
+                <includeMdcKeyName>traceId</includeMdcKeyName>
+                <includeMdcKeyName>spanId</includeMdcKeyName>
+            </encoder>
+        </appender>
 
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <queueSize>512</queueSize>
-        <appender-ref ref="FILE"/>
-    </appender>
+        <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
 
-    <root level="${logging.level.root}">
-        <appender-ref ref="ASYNC"/>
-    </root>
-    -->
+        <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>512</queueSize>
+            <appender-ref ref="FILE"/>
+        </appender>
+    </springProfile>
 
     <logger name="io.github.jhipster.sample" level="INFO"/>
 
@@ -66,9 +71,19 @@
     <!-- jhipster-needle-logback-add-log - JHipster will add a new log with level -->
 
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
-    <root level="${log.level}">
-        <appender-ref ref="CONSOLE" />
-    </root>
+
+    <springProfile name="!prod">
+        <root level="${log.level}">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="${log.level}">
+            <appender-ref ref="JSON_CONSOLE" />
+            <appender-ref ref="ASYNC" />
+        </root>
+    </springProfile>
 
     <!-- Prevent logback from outputting its own status -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>

@@ -5,6 +5,7 @@ import static io.github.jhipster.sample.security.SecurityUtils.JWT_ALGORITHM;
 import static io.github.jhipster.sample.security.SecurityUtils.USER_ID_CLAIM;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.security.DomainUserDetailsService.UserWithId;
 import io.github.jhipster.sample.web.rest.vm.LoginVM;
 import jakarta.validation.Valid;
@@ -48,21 +49,33 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    private final BusinessMetricsService businessMetricsService;
+
+    public AuthenticateController(
+        JwtEncoder jwtEncoder,
+        AuthenticationManagerBuilder authenticationManagerBuilder,
+        BusinessMetricsService businessMetricsService
+    ) {
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.businessMetricsService = businessMetricsService;
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
-
-        var authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = this.createToken(authentication, loginVM.isRememberMe());
-        var httpHeaders = new HttpHeaders();
-        httpHeaders.setBearerAuth(jwt);
-        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+        try {
+            var authenticationToken = new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
+            var authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = this.createToken(authentication, loginVM.isRememberMe());
+            var httpHeaders = new HttpHeaders();
+            httpHeaders.setBearerAuth(jwt);
+            businessMetricsService.incrementLoginSuccess();
+            return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            businessMetricsService.incrementLoginFailure();
+            throw e;
+        }
     }
 
     /**

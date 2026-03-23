@@ -1,0 +1,214 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "bytes"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "JVM Heap Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area=\"heap\"}",
+          "legendFormat": "Used"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area=\"heap\"}",
+          "legendFormat": "Max"
+        },
+        {
+          "expr": "jvm_memory_committed_bytes{area=\"heap\"}",
+          "legendFormat": "Committed"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "title": "GC Pause Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(jvm_gc_pause_seconds_sum[5m])",
+          "legendFormat": "{{action}} - {{cause}}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "title": "HikariCP Active Connections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active",
+          "legendFormat": "Active"
+        },
+        {
+          "expr": "hikaricp_connections_idle",
+          "legendFormat": "Idle"
+        },
+        {
+          "expr": "hikaricp_connections_max",
+          "legendFormat": "Max"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "title": "HikariCP Pending Connections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_pending",
+          "legendFormat": "Pending"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "id": 5,
+      "title": "Thread Count",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads",
+          "legendFormat": "Live"
+        },
+        {
+          "expr": "jvm_threads_daemon_threads",
+          "legendFormat": "Daemon"
+        },
+        {
+          "expr": "jvm_threads_peak_threads",
+          "legendFormat": "Peak"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "percentunit",
+          "max": 1
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "id": 6,
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "process_cpu_usage",
+          "legendFormat": "Process CPU"
+        },
+        {
+          "expr": "system_cpu_usage",
+          "legendFormat": "System CPU"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "ops"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "id": 7,
+      "title": "Logback Events Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(logback_events_total{level=\"error\"}[5m])",
+          "legendFormat": "Error"
+        },
+        {
+          "expr": "rate(logback_events_total{level=\"warn\"}[5m])",
+          "legendFormat": "Warn"
+        },
+        {
+          "expr": "rate(logback_events_total{level=\"info\"}[5m])",
+          "legendFormat": "Info"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+      "id": 8,
+      "title": "HikariCP Connection Pool Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active / hikaricp_connections_max",
+          "legendFormat": "Pool Usage %"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["jhipster", "infrastructure"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Infrastructure",
+  "uid": "infrastructure",
+  "version": 1
+}
