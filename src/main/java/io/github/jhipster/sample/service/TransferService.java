@@ -54,7 +54,7 @@ public class TransferService {
         }
 
         BankAccount sourceAccount = bankAccountRepository
-            .findOneWithToOneRelationships(transfer.getSourceAccount().getId())
+            .findOneWithLockById(transfer.getSourceAccount().getId())
             .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
 
         BankAccount destinationAccount = bankAccountRepository

@@ -24,8 +24,9 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
         value = "select t from Transfer t left join fetch t.sourceAccount sa left join fetch sa.user " +
             "left join fetch t.destinationAccount da left join fetch da.user " +
             "where sa.user.login = ?#{authentication.name} or da.user.login = ?#{authentication.name}",
-        countQuery = "select count(t) from Transfer t " +
-            "where t.sourceAccount.user.login = ?#{authentication.name} or t.destinationAccount.user.login = ?#{authentication.name}"
+        countQuery = "select count(t) from Transfer t left join t.sourceAccount sa left join sa.user sau " +
+            "left join t.destinationAccount da left join da.user dau " +
+            "where sau.login = ?#{authentication.name} or dau.login = ?#{authentication.name}"
     )
     Page<Transfer> findAllForCurrentUser(Pageable pageable);
 
@@ -41,9 +42,10 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
             "left join fetch t.destinationAccount da left join fetch da.user " +
             "where (sa.id = :accountId or da.id = :accountId) " +
             "and (sa.user.login = ?#{authentication.name} or da.user.login = ?#{authentication.name})",
-        countQuery = "select count(t) from Transfer t " +
-            "where (t.sourceAccount.id = :accountId or t.destinationAccount.id = :accountId) " +
-            "and (t.sourceAccount.user.login = ?#{authentication.name} or t.destinationAccount.user.login = ?#{authentication.name})"
+        countQuery = "select count(t) from Transfer t left join t.sourceAccount sa left join sa.user sau " +
+            "left join t.destinationAccount da left join da.user dau " +
+            "where (sa.id = :accountId or da.id = :accountId) " +
+            "and (sau.login = ?#{authentication.name} or dau.login = ?#{authentication.name})"
     )
     Page<Transfer> findAllByAccountId(@Param("accountId") Long accountId, Pageable pageable);
 }
