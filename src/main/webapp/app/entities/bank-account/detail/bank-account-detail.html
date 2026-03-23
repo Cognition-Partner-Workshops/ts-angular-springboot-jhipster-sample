@@ -38,6 +38,42 @@
         <button type="button" [routerLink]="['/bank-account', bankAccountRef.id, 'edit']" class="btn btn-primary">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
+
+        <hr />
+
+        <h3 jhiTranslate="jhipsterSampleApplicationApp.transfer.recentTransfers">Recent Transfers</h3>
+
+        @if (recentTransfers().length > 0) {
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.date">Date</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.counterparty">Counterparty</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.amount">Amount</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.description">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (transfer of recentTransfers(); track transfer.id) {
+                  @let display = getTransferDisplay(transfer);
+                  <tr>
+                    <td>{{ transfer.date | date: 'medium' }}</td>
+                    <td>{{ display.counterparty }}</td>
+                    <td [class.text-danger]="display.direction === 'outgoing'" [class.text-success]="display.direction === 'incoming'">
+                      {{ display.amount | number: '1.2-2' }}
+                    </td>
+                    <td>{{ transfer.description }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="alert alert-info" jhiTranslate="jhipsterSampleApplicationApp.transfer.noTransfers">
+            No transfers found for this account.
+          </div>
+        }
       </div>
     }
   </div>

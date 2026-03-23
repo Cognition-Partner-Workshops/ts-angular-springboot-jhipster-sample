@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
@@ -18,6 +20,8 @@ describe('BankAccount Management Detail Component', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter(
           [
             {

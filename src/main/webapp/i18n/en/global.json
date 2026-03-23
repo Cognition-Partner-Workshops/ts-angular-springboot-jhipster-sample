@@ -11,7 +11,8 @@
         "adminAuthority": "Authority",
         "bankAccount": "Bank Account",
         "label": "Label",
-        "operation": "Operation"
+        "operation": "Operation",
+        "transfer": "Transfer Funds"
       },
       "account": {
         "main": "Account",
@@ -142,6 +143,10 @@
     "idnull": "Invalid ID",
     "idinvalid": "Invalid ID",
     "idnotfound": "ID cannot be found",
+    "sameaccount": "Source and destination accounts must be different",
+    "insufficientfunds": "Insufficient funds in the source account",
+    "forbidden": "You are not authorized to perform this action",
+    "loginnotfound": "Current user login not found",
     "file": {
       "could.not.extract": "Could not extract file",
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""

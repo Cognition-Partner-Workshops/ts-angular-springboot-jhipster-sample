@@ -1,0 +1,116 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-transfer-heading" data-cy="TransferCreateHeading" jhiTranslate="jhipsterSampleApplicationApp.transfer.home.createLabel">
+        Transfer Funds
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @let sourceRef = editForm.get('sourceAccount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_sourceAccount" jhiTranslate="jhipsterSampleApplicationApp.transfer.sourceAccount"
+            >From Account</label
+          >
+          <select
+            class="form-control"
+            id="field_sourceAccount"
+            data-cy="sourceAccount"
+            name="sourceAccount"
+            formControlName="sourceAccount"
+            [compareWith]="compareAccount"
+          >
+            <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.transfer.selectAccount">-- Select Account --</option>
+            @for (account of bankAccounts(); track account.id) {
+              <option [ngValue]="account">{{ account.name }} - {{ account.balance | number: '1.2-2' }}</option>
+            }
+          </select>
+          @if (sourceRef.invalid && (sourceRef.dirty || sourceRef.touched)) {
+            <div>
+              @if (sourceRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let destRef = editForm.get('destinationAccount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_destinationAccount" jhiTranslate="jhipsterSampleApplicationApp.transfer.destinationAccount"
+            >To Account</label
+          >
+          <select
+            class="form-control"
+            id="field_destinationAccount"
+            data-cy="destinationAccount"
+            name="destinationAccount"
+            formControlName="destinationAccount"
+            [compareWith]="compareAccount"
+          >
+            <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.transfer.selectAccount">-- Select Account --</option>
+            @for (account of filteredDestinationAccounts(); track account.id) {
+              <option [ngValue]="account">{{ account.name }} - {{ account.balance | number: '1.2-2' }}</option>
+            }
+          </select>
+          @if (destRef.invalid && (destRef.dirty || destRef.touched)) {
+            <div>
+              @if (destRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let amountRef = editForm.get('amount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_amount" jhiTranslate="jhipsterSampleApplicationApp.transfer.amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" step="0.01" />
+          @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+            <div>
+              @if (amountRef.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              @if (amountRef.errors?.min) {
+                <small class="form-text text-danger">Amount must be at least 0.01.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="jhipsterSampleApplicationApp.transfer.description"
+            >Description</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+          @if (editForm.get('description')?.errors?.maxlength) {
+            <small class="form-text text-danger">Description cannot be longer than 255 characters.</small>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="exchange-alt" />&nbsp;<span jhiTranslate="jhipsterSampleApplicationApp.transfer.action.transfer">Transfer</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

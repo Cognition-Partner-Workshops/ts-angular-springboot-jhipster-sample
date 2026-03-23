@@ -1,0 +1,27 @@
+{
+  "jhipsterSampleApplicationApp": {
+    "transfer": {
+      "home": {
+        "title": "Transfers",
+        "createLabel": "Transfer Funds"
+      },
+      "created": "Transfer completed successfully with identifier {{ param }}",
+      "detail": {
+        "title": "Transfer"
+      },
+      "id": "ID",
+      "amount": "Amount",
+      "date": "Date",
+      "description": "Description",
+      "sourceAccount": "From Account",
+      "destinationAccount": "To Account",
+      "selectAccount": "-- Select Account --",
+      "recentTransfers": "Recent Transfers",
+      "noTransfers": "No transfers found for this account.",
+      "counterparty": "Counterparty",
+      "action": {
+        "transfer": "Transfer"
+      }
+    }
+  }
+}
