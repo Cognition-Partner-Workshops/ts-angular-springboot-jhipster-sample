@@ -29,3 +29,12 @@ services:
     # On MacOS, remove next line and replace localhost by host.docker.internal in prometheus/prometheus.yml and
     # grafana/provisioning/datasources/datasource.yml
     network_mode: 'host' # to test locally running service
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    volumes:
+      - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - 127.0.0.1:9093:9093
+    network_mode: 'host'

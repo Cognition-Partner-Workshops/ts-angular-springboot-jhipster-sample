@@ -1,0 +1,62 @@
+groups:
+  - name: application
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'High HTTP 5xx error rate (> 5%)'
+          description: 'The 5xx error rate is {{ $value | humanizePercentage }} over the last 5 minutes.'
+          runbook_url: 'docs/runbook.md#high-error-rate'
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High p99 latency (> 2s)'
+          description: 'The p99 HTTP request latency is {{ $value }}s over the last 5 minutes.'
+          runbook_url: 'docs/runbook.md#high-latency'
+
+      - alert: JvmHeapHigh
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'JVM heap usage > 90%'
+          description: 'JVM heap usage is at {{ $value | humanizePercentage }}.'
+          runbook_url: 'docs/runbook.md#jvm-heap-high'
+
+      - alert: HikariCPPoolExhaustion
+        expr: hikaricp_connections_pending > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'HikariCP connection pool has > 5 pending requests'
+          description: 'There are {{ $value }} pending connection requests in the HikariCP pool.'
+          runbook_url: 'docs/runbook.md#hikaricp-pool-exhaustion'
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Application instance is down'
+          description: 'The instance {{ $labels.instance }} has been unreachable for more than 1 minute.'
+          runbook_url: 'docs/runbook.md#instance-down'
+
+      - alert: HighInvalidTokenRate
+        expr: rate(security_authentication_invalid_tokens_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High rate of invalid authentication tokens'
+          description: 'Invalid token rate is {{ $value }}/s over the last 5 minutes.'
+          runbook_url: 'docs/runbook.md#high-invalid-token-rate'
