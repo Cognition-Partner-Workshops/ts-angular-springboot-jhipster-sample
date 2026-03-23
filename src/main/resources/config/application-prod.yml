@@ -27,7 +27,7 @@ management:
         step: 60
   tracing:
     sampling:
-      probability: 1.0
+      probability: ${MANAGEMENT_TRACING_SAMPLING_PROBABILITY:0.1}
     propagation:
       type: w3c
   otlp:

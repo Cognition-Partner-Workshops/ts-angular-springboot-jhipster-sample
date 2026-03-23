@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.math.BigDecimal;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -41,14 +40,7 @@ public class ObservabilityConfiguration {
             .publishPercentiles(0.5, 0.75, 0.95, 0.99)
             .register(registry);
 
-        Gauge.builder("business.accounts.total_balance", bankAccountRepository, repo ->
-            repo
-                .findAll()
-                .stream()
-                .map(account -> account.getBalance())
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .doubleValue()
-        )
+        Gauge.builder("business.accounts.total_balance", bankAccountRepository, repo -> repo.sumAllBalances().doubleValue())
             .description("Total balance across all bank accounts")
             .baseUnit("currency")
             .register(registry);
