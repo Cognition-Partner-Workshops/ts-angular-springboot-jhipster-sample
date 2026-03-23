@@ -88,8 +88,8 @@
 
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
 
-    <!-- Dev profile: plain text console logging -->
-    <springProfile name="dev | default">
+    <!-- Non-prod profiles: plain text console logging (fallback for dev, test, staging, etc.) -->
+    <springProfile name="!prod">
         <root level="${log.level}">
             <appender-ref ref="CONSOLE" />
         </root>
