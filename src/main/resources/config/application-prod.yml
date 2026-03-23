@@ -106,7 +106,7 @@ jhipster:
   mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://my-server-url-to-change # Modify according to your server's URL
   logging:
-    use-json-format: false # By default, logs are not in Json format
+    use-json-format: true # Enable JSON format for production logging
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false
       host: localhost

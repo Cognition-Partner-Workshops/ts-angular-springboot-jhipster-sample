@@ -14,4 +14,10 @@ public class LoggingAspectConfiguration {
     public LoggingAspect loggingAspect(Environment env) {
         return new LoggingAspect(env);
     }
+
+    @Bean
+    @Profile(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
+    public LoggingAspect productionLoggingAspect(Environment env) {
+        return new LoggingAspect(env);
+    }
 }
