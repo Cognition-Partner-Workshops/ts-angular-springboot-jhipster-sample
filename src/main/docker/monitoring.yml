@@ -29,3 +29,12 @@ services:
     # On MacOS, remove next line and replace localhost by host.docker.internal in prometheus/prometheus.yml and
     # grafana/provisioning/datasources/datasource.yml
     network_mode: 'host' # to test locally running service
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ['-config.file=/etc/tempo/tempo.yml']
+    volumes:
+      - ./tempo/:/etc/tempo/
+    ports:
+      - 127.0.0.1:4318:4318
+      - 127.0.0.1:3200:3200
+    network_mode: 'host'
