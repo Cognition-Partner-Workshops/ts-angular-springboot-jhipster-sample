@@ -24,12 +24,6 @@
             </encoder>
         </appender>
 
-        <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
-
-        <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-            <queueSize>512</queueSize>
-            <appender-ref ref="FILE"/>
-        </appender>
     </springProfile>
 
     <logger name="io.github.jhipster.sample" level="INFO"/>
@@ -81,7 +75,6 @@
     <springProfile name="prod">
         <root level="${log.level}">
             <appender-ref ref="JSON_CONSOLE" />
-            <appender-ref ref="ASYNC" />
         </root>
     </springProfile>
 
