@@ -53,13 +53,30 @@ public class TransferService {
             throw new BadRequestAlertException("Destination account is required", ENTITY_NAME, "idnotfound");
         }
 
-        BankAccount sourceAccount = bankAccountRepository
-            .findOneWithLockById(transfer.getSourceAccount().getId())
-            .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
+        Long sourceId = transfer.getSourceAccount().getId();
+        Long destId = transfer.getDestinationAccount().getId();
 
-        BankAccount destinationAccount = bankAccountRepository
-            .findOneWithToOneRelationships(transfer.getDestinationAccount().getId())
-            .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+        // Acquire locks in ascending ID order to prevent deadlocks
+        BankAccount firstLocked;
+        BankAccount secondLocked;
+        if (sourceId.compareTo(destId) < 0) {
+            firstLocked = bankAccountRepository
+                .findOneWithLockById(sourceId)
+                .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
+            secondLocked = bankAccountRepository
+                .findOneWithLockById(destId)
+                .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+        } else {
+            secondLocked = bankAccountRepository
+                .findOneWithLockById(destId)
+                .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+            firstLocked = bankAccountRepository
+                .findOneWithLockById(sourceId)
+                .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
+        }
+
+        BankAccount sourceAccount = sourceId.equals(firstLocked.getId()) ? firstLocked : secondLocked;
+        BankAccount destinationAccount = destId.equals(firstLocked.getId()) ? firstLocked : secondLocked;
 
         // Validate source != destination
         if (Objects.equals(sourceAccount.getId(), destinationAccount.getId())) {
