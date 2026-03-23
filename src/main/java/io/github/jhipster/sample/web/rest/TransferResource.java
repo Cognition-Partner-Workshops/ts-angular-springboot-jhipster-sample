@@ -1,6 +1,8 @@
 package io.github.jhipster.sample.web.rest;
 
+import io.github.jhipster.sample.domain.BankAccount;
 import io.github.jhipster.sample.domain.Transfer;
+import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.repository.TransferRepository;
 import io.github.jhipster.sample.security.SecurityUtils;
 import io.github.jhipster.sample.service.TransferService;
@@ -38,10 +40,16 @@ public class TransferResource {
 
     private final TransferService transferService;
     private final TransferRepository transferRepository;
+    private final BankAccountRepository bankAccountRepository;
 
-    public TransferResource(TransferService transferService, TransferRepository transferRepository) {
+    public TransferResource(
+        TransferService transferService,
+        TransferRepository transferRepository,
+        BankAccountRepository bankAccountRepository
+    ) {
         this.transferService = transferService;
         this.transferRepository = transferRepository;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
     /**
@@ -120,6 +128,16 @@ public class TransferResource {
     @GetMapping("/by-account/{accountId}")
     public ResponseEntity<?> getTransfersByAccount(@PathVariable("accountId") Long accountId, Pageable pageable) {
         LOG.debug("REST request to get Transfers for account : {}", accountId);
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() ->
+            new BadRequestAlertException("Current user login not found", ENTITY_NAME, "loginnotfound")
+        );
+
+        // Verify the current user owns the requested account
+        Optional<BankAccount> account = bankAccountRepository.findById(accountId);
+        if (account.isEmpty() || account.get().getUser() == null || !login.equals(account.get().getUser().getLogin())) {
+            return ResponseEntity.status(403).build();
+        }
+
         Page<Transfer> page = transferRepository.findAllByAccountId(accountId, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
