@@ -246,7 +246,7 @@ Pre-existing JHipster JVM dashboard with detailed JVM internals.
 | Alert                    | Expression                                                                           | Duration | Severity | Meaning                                     |
 |--------------------------|--------------------------------------------------------------------------------------|----------|----------|---------------------------------------------|
 | HighErrorRate            | `rate(http_server_requests_seconds_count{status=~"5.."}[5m]) > 0.5`                 | 5m       | Critical | More than 0.5 server errors per second      |
-| HighLatency              | `histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 2`        | 5m       | Warning  | P95 latency exceeds 2 seconds               |
+| HighLatency              | `histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 2` | 5m       | Warning  | P95 latency exceeds 2 seconds               |
 | JvmHeapPressure          | `jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85`     | 5m       | Warning  | Heap usage above 85%                        |
 | HikariPoolExhaustion     | `hikaricp_connections_pending > 5`                                                   | 5m       | Critical | More than 5 threads waiting for connections |
 | ApplicationDown          | `up == 0`                                                                            | 1m       | Critical | Application instance is unreachable         |
