@@ -22,7 +22,9 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
             "left join fetch da.user " +
             "where sa.user.login = :login or da.user.login = :login",
         countQuery = "select count(t) from Transfer t " +
-            "where t.sourceAccount.user.login = :login or t.destinationAccount.user.login = :login"
+            "left join t.sourceAccount sa left join sa.user sau " +
+            "left join t.destinationAccount da left join da.user dau " +
+            "where sau.login = :login or dau.login = :login"
     )
     Page<Transfer> findAllByCurrentUser(@Param("login") String login, Pageable pageable);
 

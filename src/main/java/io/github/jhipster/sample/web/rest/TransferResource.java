@@ -133,7 +133,7 @@ public class TransferResource {
         );
 
         // Verify the current user owns the requested account
-        Optional<BankAccount> account = bankAccountRepository.findById(accountId);
+        Optional<BankAccount> account = bankAccountRepository.findOneWithEagerRelationships(accountId);
         if (account.isEmpty() || account.get().getUser() == null || !login.equals(account.get().getUser().getLogin())) {
             return ResponseEntity.status(403).build();
         }
