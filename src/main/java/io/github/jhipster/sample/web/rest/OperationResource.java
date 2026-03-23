@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.Operation;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.repository.OperationRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -41,9 +42,11 @@ public class OperationResource {
     private String applicationName;
 
     private final OperationRepository operationRepository;
+    private final BusinessMetricsService businessMetricsService;
 
-    public OperationResource(OperationRepository operationRepository) {
+    public OperationResource(OperationRepository operationRepository, BusinessMetricsService businessMetricsService) {
         this.operationRepository = operationRepository;
+        this.businessMetricsService = businessMetricsService;
     }
 
     /**
@@ -60,6 +63,7 @@ public class OperationResource {
             throw new BadRequestAlertException("A new operation cannot already have an ID", ENTITY_NAME, "idexists");
         }
         operation = operationRepository.save(operation);
+        businessMetricsService.recordOperation(operation.getAmount());
         return ResponseEntity.created(new URI("/api/operations/" + operation.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, operation.getId().toString()))
             .body(operation);
@@ -93,6 +97,7 @@ public class OperationResource {
         }
 
         operation = operationRepository.save(operation);
+        businessMetricsService.recordOperation(operation.getAmount());
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, operation.getId().toString()))
             .body(operation);

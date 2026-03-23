@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.BankAccount;
+import io.github.jhipster.sample.management.BusinessMetricsService;
 import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -36,9 +37,11 @@ public class BankAccountResource {
     private String applicationName;
 
     private final BankAccountRepository bankAccountRepository;
+    private final BusinessMetricsService businessMetricsService;
 
-    public BankAccountResource(BankAccountRepository bankAccountRepository) {
+    public BankAccountResource(BankAccountRepository bankAccountRepository, BusinessMetricsService businessMetricsService) {
         this.bankAccountRepository = bankAccountRepository;
+        this.businessMetricsService = businessMetricsService;
     }
 
     /**
@@ -54,10 +57,11 @@ public class BankAccountResource {
         if (bankAccount.getId() != null) {
             throw new BadRequestAlertException("A new bankAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        bankAccount = bankAccountRepository.save(bankAccount);
-        return ResponseEntity.created(new URI("/api/bank-accounts/" + bankAccount.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
-            .body(bankAccount);
+        BankAccount result = businessMetricsService.timeAccountCreation(() -> bankAccountRepository.save(bankAccount));
+        businessMetricsService.incrementAccountCreated();
+        return ResponseEntity.created(new URI("/api/bank-accounts/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .body(result);
     }
 
     /**
@@ -178,6 +182,7 @@ public class BankAccountResource {
     public ResponseEntity<Void> deleteBankAccount(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete BankAccount : {}", id);
         bankAccountRepository.deleteById(id);
+        businessMetricsService.incrementAccountDeleted();
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
