@@ -47,6 +47,10 @@ public class TransferService {
         Long sourceId = transfer.getSourceAccount().getId();
         Long destId = transfer.getDestinationAccount().getId();
 
+        if (sourceId == null || destId == null) {
+            throw new BadRequestAlertException("Source and destination account IDs must be provided", ENTITY_NAME, "idnull");
+        }
+
         // Validate source != destination
         if (sourceId.equals(destId)) {
             throw new BadRequestAlertException("Source and destination accounts must be different", ENTITY_NAME, "sameaccount");
