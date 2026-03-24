@@ -189,7 +189,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(bank_account_created_total[5m])",
+          "expr": "rate(bank_account_total[5m])",
           "legendFormat": "Accounts/s",
           "refId": "A"
         }
@@ -267,7 +267,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(bank_account_created_total[5m])",
+          "expr": "rate(bank_account_total[5m])",
           "legendFormat": "Account Creations/s",
           "refId": "A"
         }
@@ -483,7 +483,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(operation_created_total[5m])",
+          "expr": "rate(operation_total[5m])",
           "legendFormat": "Ops/s",
           "refId": "A"
         }
@@ -561,7 +561,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(operation_created_total[5m])",
+          "expr": "rate(operation_total[5m])",
           "legendFormat": "Operations/s",
           "refId": "A"
         }
@@ -726,7 +726,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(security_authentication_invalid_tokens_total[5m])",
+          "expr": "rate(security_authentication_invalid_tokens_errors_total[5m])",
           "legendFormat": "Invalid Tokens/s",
           "refId": "A"
         }
@@ -812,7 +812,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(security_authentication_invalid_tokens_total[5m])",
+          "expr": "rate(security_authentication_invalid_tokens_errors_total[5m])",
           "legendFormat": "Invalid Tokens/s",
           "refId": "A"
         }

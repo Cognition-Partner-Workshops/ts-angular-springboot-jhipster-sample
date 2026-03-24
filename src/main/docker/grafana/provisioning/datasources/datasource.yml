@@ -10,6 +10,8 @@ deleteDatasources:
 datasources:
   # <string, required> name of the datasource. Required
   - name: Prometheus
+    # <string> unique identifier for this datasource
+    uid: prometheus
     # <string, required> datasource type. Required
     type: prometheus
     # <string, required> access mode. direct or proxy. Required
@@ -49,6 +51,7 @@ datasources:
     # <bool> allow users to edit datasources from the UI.
     editable: true
   - name: Tempo
+    uid: tempo
     type: tempo
     access: proxy
     orgId: 1

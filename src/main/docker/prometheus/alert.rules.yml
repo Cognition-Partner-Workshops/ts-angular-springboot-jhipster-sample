@@ -2,7 +2,7 @@ groups:
   - name: application
     rules:
       - alert: HighErrorRate
-        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.05
+        expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count[5m])) > 0.05
         for: 5m
         labels:
           severity: critical
@@ -42,7 +42,7 @@ groups:
           summary: 'Application instance is down'
 
       - alert: HighInvalidTokenRate
-        expr: rate(security_authentication_invalid_tokens_total[5m]) > 1
+        expr: rate(security_authentication_invalid_tokens_errors_total[5m]) > 1
         for: 5m
         labels:
           severity: warning
