@@ -43,6 +43,6 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     Optional<BankAccount> findOneWithToOneRelationships(@Param("id") Long id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select bankAccount from BankAccount bankAccount left join fetch bankAccount.user where bankAccount.id = :id")
+    @Query("select bankAccount from BankAccount bankAccount where bankAccount.id = :id")
     Optional<BankAccount> findOneForUpdate(@Param("id") Long id);
 }
