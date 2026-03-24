@@ -55,7 +55,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        Span span = tracer.nextSpan().name("http " + request.getMethod() + " " + request.getRequestURI());
+        Span span = tracer.nextSpan().name("http " + request.getMethod());
         try (Tracer.SpanInScope scope = tracer.withSpan(span.start())) {
             String requestId = request.getHeader(REQUEST_ID_HEADER);
             if (requestId == null || requestId.isBlank()) {
