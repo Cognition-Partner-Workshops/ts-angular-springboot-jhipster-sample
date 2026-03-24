@@ -3,6 +3,7 @@ package io.github.jhipster.sample.web.rest;
 import io.github.jhipster.sample.domain.Transfer;
 import io.github.jhipster.sample.repository.TransferRepository;
 import io.github.jhipster.sample.service.TransferService;
+import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,6 +54,9 @@ public class TransferResource {
     @PostMapping("")
     public ResponseEntity<Transfer> createTransfer(@Valid @RequestBody Transfer transfer) throws URISyntaxException {
         LOG.debug("REST request to execute Transfer : {}", transfer);
+        if (transfer.getId() != null) {
+            throw new BadRequestAlertException("A new transfer cannot already have an ID", ENTITY_NAME, "idexists");
+        }
         Transfer result = transferService.executeTransfer(transfer);
         return ResponseEntity.created(new URI("/api/transfers/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))

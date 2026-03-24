@@ -33,7 +33,6 @@ public class Transfer implements Serializable {
     @Column(name = "amount", precision = 21, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    @NotNull
     @Column(name = "date", nullable = false)
     private Instant date;
 

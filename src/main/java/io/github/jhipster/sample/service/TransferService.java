@@ -64,13 +64,26 @@ public class TransferService {
             throw new BadRequestAlertException("Source and destination accounts must be different", ENTITY_NAME, "sameaccount");
         }
 
-        // Load accounts
-        BankAccount sourceAccount = bankAccountRepository
-            .findOneWithEagerRelationships(sourceId)
-            .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
-        BankAccount destAccount = bankAccountRepository
-            .findOneWithEagerRelationships(destId)
-            .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+        // Load accounts with pessimistic locking (ordered by ID to prevent deadlocks)
+        BankAccount firstAccount;
+        BankAccount secondAccount;
+        if (sourceId < destId) {
+            firstAccount = bankAccountRepository
+                .findOneForUpdate(sourceId)
+                .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
+            secondAccount = bankAccountRepository
+                .findOneForUpdate(destId)
+                .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+        } else {
+            secondAccount = bankAccountRepository
+                .findOneForUpdate(destId)
+                .orElseThrow(() -> new BadRequestAlertException("Destination account not found", ENTITY_NAME, "idnotfound"));
+            firstAccount = bankAccountRepository
+                .findOneForUpdate(sourceId)
+                .orElseThrow(() -> new BadRequestAlertException("Source account not found", ENTITY_NAME, "idnotfound"));
+        }
+        BankAccount sourceAccount = sourceId.equals(firstAccount.getId()) ? firstAccount : secondAccount;
+        BankAccount destAccount = destId.equals(firstAccount.getId()) ? firstAccount : secondAccount;
 
         // Verify ownership - current user must own the source account
         String currentUserLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new ErrorResponseException(HttpStatus.FORBIDDEN));
