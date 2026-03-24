@@ -201,14 +201,16 @@ This starts:
 
 **Purpose:** Track application-specific banking business metrics.
 
-| Panel                         | What It Shows                                 | Key Metric                           |
-| ----------------------------- | --------------------------------------------- | ------------------------------------ |
-| Bank Accounts Total           | Total number of bank accounts (gauge)         | `bank_accounts_total`                |
-| Bank Account Creations        | Rate of new bank account creation             | `bank_accounts_created_total`        |
-| Operations Count              | Total financial operations counter            | `operations_total`                   |
-| Operations by Type            | Distribution of operations by category        | `operations_total` grouped by `type` |
-| Operation Amount Distribution | Statistical distribution of operation amounts | `operation_amount_summary`           |
-| Active Users                  | Currently active authenticated users          | Derived from session/auth metrics    |
+| Panel                         | What It Shows                                 | Key Metric                     |
+| ----------------------------- | --------------------------------------------- | ------------------------------ |
+| Bank Account Count            | Current number of bank accounts (gauge)       | `bank_account_count`           |
+| Bank Account Total Balance    | Sum of all bank account balances (gauge)      | `bank_account_total_balance`   |
+| Bank Account Creations        | Rate of new bank account creation             | `bank_account_created_total`   |
+| Bank Account Updates          | Rate of bank account updates                  | `bank_account_updated_total`   |
+| Bank Account Deletions        | Rate of bank account deletions                | `bank_account_deleted_total`   |
+| Operation Count               | Current number of operations (gauge)          | `operation_count`              |
+| Operation Creations           | Rate of new operation creation                | `operation_created_total`      |
+| Operation Amount Distribution | Statistical distribution of operation amounts | `operation_amount` (histogram) |
 
 **When to check:** To understand business activity patterns, validate feature releases, or investigate anomalies in user behavior.
 
@@ -259,12 +261,12 @@ This starts:
 
 ### 4.1 HighErrorRate
 
-| Property       | Value                                                                                                                         |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Severity**   | critical                                                                                                                      |
-| **Expression** | `sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_count[5m])) > 0.01` |
-| **Duration**   | 5 minutes                                                                                                                     |
-| **Meaning**    | More than 1% of HTTP requests are returning 5xx errors over a 5-minute window                                                 |
+| Property       | Value                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Severity**   | critical                                                                                                            |
+| **Expression** | `rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.05` |
+| **Duration**   | 5 minutes                                                                                                           |
+| **Meaning**    | More than 5% of HTTP requests are returning 5xx errors over a 5-minute window                                       |
 
 **Likely Causes:**
 
@@ -321,12 +323,12 @@ This starts:
 
 ### 4.2 HighLatencyP99
 
-| Property       | Value                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Severity**   | warning                                                                                                      |
-| **Expression** | `histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{uri=~"/api/.*"}[5m])) by (le)) > 1.0` |
-| **Duration**   | 5 minutes                                                                                                    |
-| **Meaning**    | The 99th percentile latency for API endpoints exceeds 1 second                                               |
+| Property       | Value                                                                         |
+| -------------- | ----------------------------------------------------------------------------- |
+| **Severity**   | warning                                                                       |
+| **Expression** | `histogram_quantile(0.99, rate(http_server_requests_seconds_bucket[5m])) > 2` |
+| **Duration**   | 5 minutes                                                                     |
+| **Meaning**    | The 99th percentile latency for HTTP requests exceeds 2 seconds               |
 
 **Likely Causes:**
 
@@ -382,12 +384,12 @@ This starts:
 
 ### 4.3 JvmHeapHigh
 
-| Property       | Value                                                                                    |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **Severity**   | warning                                                                                  |
-| **Expression** | `sum(jvm_memory_used_bytes{area="heap"}) / sum(jvm_memory_max_bytes{area="heap"}) > 0.9` |
-| **Duration**   | 5 minutes                                                                                |
-| **Meaning**    | JVM heap memory usage is above 90% of the configured maximum                             |
+| Property       | Value                                                                          |
+| -------------- | ------------------------------------------------------------------------------ |
+| **Severity**   | critical                                                                       |
+| **Expression** | `jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.9` |
+| **Duration**   | 5 minutes                                                                      |
+| **Meaning**    | JVM heap memory usage is above 90% of the configured maximum                   |
 
 **Likely Causes:**
 
@@ -455,12 +457,12 @@ This starts:
 
 ### 4.4 HikariPoolExhaustion
 
-| Property       | Value                                                                            |
-| -------------- | -------------------------------------------------------------------------------- |
-| **Severity**   | critical                                                                         |
-| **Expression** | `hikaricp_connections_pending{pool="Hikari"} > 5`                                |
-| **Duration**   | 2 minutes                                                                        |
-| **Meaning**    | More than 5 threads are waiting for a database connection from the HikariCP pool |
+| Property       | Value                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------- |
+| **Severity**   | critical                                                                                |
+| **Expression** | `hikaricp_connections_active / hikaricp_connections_max > 0.9`                          |
+| **Duration**   | 2 minutes                                                                               |
+| **Meaning**    | HikariCP connection pool utilization exceeds 90% (active connections / max connections) |
 
 **Likely Causes:**
 
@@ -553,7 +555,7 @@ This starts:
 | Property       | Value                                                      |
 | -------------- | ---------------------------------------------------------- |
 | **Severity**   | critical                                                   |
-| **Expression** | `up{job="prometheus"} == 0`                                |
+| **Expression** | `up == 0`                                                  |
 | **Duration**   | 1 minute                                                   |
 | **Meaning**    | Prometheus cannot reach the application's metrics endpoint |
 
@@ -627,12 +629,12 @@ This starts:
 
 ### 4.6 HighInvalidTokenRate
 
-| Property       | Value                                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------------------- |
-| **Severity**   | warning                                                                                                 |
-| **Expression** | `sum(rate(security_authentication_invalid_tokens_total[5m])) > 10`                                      |
-| **Duration**   | 5 minutes                                                                                               |
-| **Meaning**    | The rate of invalid JWT token presentations exceeds 10 per second, indicating potential security issues |
+| Property       | Value                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------ |
+| **Severity**   | warning                                                                                                |
+| **Expression** | `rate(security_authentication_invalid_tokens_total[5m]) > 1`                                           |
+| **Duration**   | 5 minutes                                                                                              |
+| **Meaning**    | The rate of invalid JWT token presentations exceeds 1 per second, indicating potential security issues |
 
 **Likely Causes:**
 
@@ -847,15 +849,17 @@ curl -X POST http://localhost:8080/management/loggers/io.github.jhipster.sample 
 
 #### Development Profile
 
-Human-readable console output with color coding:
+Human-readable console output with color coding and MDC correlation fields:
 
 ```
-2026-03-23T10:15:30.123Z  INFO 12345 --- [main] i.g.j.s.JhipsterSampleApplicationApp     : Started JhipsterSampleApplicationApp in 8.5 seconds
+2026-03-23T10:15:30.123Z  INFO 12345 --- [main] [req-uuid] [admin] [trace-id] [span-id] i.g.j.s.JhipsterSampleApplicationApp     : Started JhipsterSampleApplicationApp in 8.5 seconds
 ```
+
+The console pattern includes `[requestId]`, `[userId]`, `[traceId]`, and `[spanId]` fields in colored output (yellow, blue, green, green respectively).
 
 #### Production Profile (Structured JSON)
 
-When `jhipster.logging.use-json-format` is set to `true`:
+In production, `jhipster.logging.use-json-format` is set to `true` in `application-prod.yml`:
 
 ```json
 {
@@ -875,12 +879,14 @@ When `jhipster.logging.use-json-format` is set to `true`:
 
 All log entries in production include these MDC (Mapped Diagnostic Context) fields:
 
-| Field       | Source                                     | Purpose                                      |
-| ----------- | ------------------------------------------ | -------------------------------------------- |
-| `requestId` | Generated per-request (UUID)               | Correlate all logs for a single HTTP request |
-| `userId`    | Extracted from JWT token / SecurityContext | Identify which user triggered the request    |
-| `traceId`   | OpenTelemetry / W3C Trace Context header   | Correlate logs across distributed services   |
-| `spanId`    | OpenTelemetry / W3C Trace Context header   | Identify the specific span within a trace    |
+| Field       | Source                                                | Purpose                                      |
+| ----------- | ----------------------------------------------------- | -------------------------------------------- |
+| `requestId` | `X-Request-ID` header or auto-generated UUID          | Correlate all logs for a single HTTP request |
+| `userId`    | Extracted from Spring SecurityContext (JWT principal) | Identify which user triggered the request    |
+| `traceId`   | OpenTelemetry / W3C Trace Context header              | Correlate logs across distributed services   |
+| `spanId`    | OpenTelemetry / W3C Trace Context header              | Identify the specific span within a trace    |
+
+These fields are populated by the `CorrelationIdFilter` (for `requestId` and `userId`) and by the Micrometer Tracing / OpenTelemetry bridge (for `traceId` and `spanId`). The filter also echoes the `requestId` back in the `X-Request-ID` response header for client-side correlation.
 
 ### Searching Logs
 
@@ -1011,28 +1017,36 @@ curl -H "traceparent: 00-${TRACE_ID}-${SPAN_ID}-01" http://external-service/api/
 | Development | 100%          | All traces are captured for debugging              |
 | Production  | 10%           | 1 in 10 traces sampled to reduce overhead and cost |
 
-Sampling is configured in `application.yml`:
+Sampling is configured via Spring Boot properties:
 
-```yaml
-management:
-  tracing:
-    sampling:
-      probability: 1.0 # dev: 100%
-      # probability: 0.1  # prod: 10%
-```
+- **`application.yml`** (base / dev default):
 
-> **Note:** Even with 10% sampling, all traces for errored requests should be captured (error-based sampling). Adjust sampling rate based on traffic volume and Tempo storage capacity.
+  ```yaml
+  management:
+    tracing:
+      sampling:
+        probability: 1.0 # 100% - capture all traces
+      propagation:
+        type: w3c
+  ```
+
+- **`application-prod.yml`** (production override):
+  ```yaml
+  management:
+    tracing:
+      sampling:
+        probability: 0.1 # 10% - sample 1 in 10 traces
+  ```
+
+> **Note:** Adjust the production sampling rate based on traffic volume and Tempo storage capacity.
 
 ### Trace Export Configuration
 
-Traces are exported to Tempo via OTLP:
+Traces are exported to Tempo via OTLP. The OTLP exporter endpoint defaults to `http://localhost:4318` (HTTP/protobuf) and can be overridden via `management.otlp.tracing.endpoint`.
 
-```yaml
-management:
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces # Tempo OTLP endpoint
-```
+The `TracingConfiguration` class provides an OpenTelemetry `Resource` bean that tags every span with the application's service name (`jhipsterSampleApplication`).
+
+The Tempo data source is auto-provisioned in Grafana via `src/main/docker/grafana/provisioning/datasources/datasource.yml`.
 
 ---
 
