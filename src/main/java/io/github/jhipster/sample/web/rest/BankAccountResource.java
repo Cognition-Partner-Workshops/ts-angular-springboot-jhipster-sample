@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.BankAccount;
+import io.github.jhipster.sample.management.BankAccountMetricsService;
 import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -36,9 +37,11 @@ public class BankAccountResource {
     private String applicationName;
 
     private final BankAccountRepository bankAccountRepository;
+    private final BankAccountMetricsService bankAccountMetricsService;
 
-    public BankAccountResource(BankAccountRepository bankAccountRepository) {
+    public BankAccountResource(BankAccountRepository bankAccountRepository, BankAccountMetricsService bankAccountMetricsService) {
         this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountMetricsService = bankAccountMetricsService;
     }
 
     /**
@@ -55,6 +58,7 @@ public class BankAccountResource {
             throw new BadRequestAlertException("A new bankAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
         bankAccount = bankAccountRepository.save(bankAccount);
+        bankAccountMetricsService.incrementCreated();
         return ResponseEntity.created(new URI("/api/bank-accounts/" + bankAccount.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
             .body(bankAccount);
@@ -88,6 +92,7 @@ public class BankAccountResource {
         }
 
         bankAccount = bankAccountRepository.save(bankAccount);
+        bankAccountMetricsService.incrementUpdated();
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, bankAccount.getId().toString()))
             .body(bankAccount);
@@ -129,7 +134,11 @@ public class BankAccountResource {
 
                 return existingBankAccount;
             })
-            .map(bankAccountRepository::save);
+            .map(bankAccountRepository::save)
+            .map(saved -> {
+                bankAccountMetricsService.incrementUpdated();
+                return saved;
+            });
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -178,6 +187,7 @@ public class BankAccountResource {
     public ResponseEntity<Void> deleteBankAccount(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete BankAccount : {}", id);
         bankAccountRepository.deleteById(id);
+        bankAccountMetricsService.incrementDeleted();
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();

@@ -71,6 +71,11 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
   metrics:
     enable:
       http: true
