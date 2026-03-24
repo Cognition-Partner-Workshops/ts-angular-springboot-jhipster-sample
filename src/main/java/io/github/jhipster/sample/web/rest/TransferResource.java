@@ -1,12 +1,15 @@
 package io.github.jhipster.sample.web.rest;
 
+import io.github.jhipster.sample.domain.BankAccount;
 import io.github.jhipster.sample.domain.Transfer;
+import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.github.jhipster.sample.repository.TransferRepository;
 import io.github.jhipster.sample.security.SecurityUtils;
 import io.github.jhipster.sample.service.TransferService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +40,16 @@ public class TransferResource {
 
     private final TransferService transferService;
     private final TransferRepository transferRepository;
+    private final BankAccountRepository bankAccountRepository;
 
-    public TransferResource(TransferService transferService, TransferRepository transferRepository) {
+    public TransferResource(
+        TransferService transferService,
+        TransferRepository transferRepository,
+        BankAccountRepository bankAccountRepository
+    ) {
         this.transferService = transferService;
         this.transferRepository = transferRepository;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
     /**
@@ -110,6 +119,12 @@ public class TransferResource {
     @GetMapping("/by-account/{accountId}")
     public ResponseEntity<?> getTransfersByAccount(@PathVariable("accountId") Long accountId, Pageable pageable) {
         LOG.debug("REST request to get Transfers for account : {}", accountId);
+        // Verify current user owns the account
+        String login = SecurityUtils.getCurrentUserLogin().orElse("");
+        BankAccount account = bankAccountRepository.findOneWithEagerRelationships(accountId).orElse(null);
+        if (account == null || account.getUser() == null || !login.equals(account.getUser().getLogin())) {
+            return ResponseEntity.ok().body(Collections.emptyList());
+        }
         Page<Transfer> page = transferRepository.findAllByAccountId(accountId, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());

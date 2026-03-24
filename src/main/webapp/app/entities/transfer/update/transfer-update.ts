@@ -12,7 +12,7 @@ import { IBankAccount } from 'app/entities/bank-account/bank-account.model';
 import { BankAccountService } from 'app/entities/bank-account/service/bank-account.service';
 import { AlertError } from 'app/shared/alert/alert-error';
 import { TranslateDirective } from 'app/shared/language';
-import { ITransfer, NewTransfer } from '../transfer.model';
+import { NewTransfer } from '../transfer.model';
 import { TransferService } from '../service/transfer.service';
 
 @Component({
