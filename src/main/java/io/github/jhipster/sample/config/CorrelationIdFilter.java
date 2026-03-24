@@ -1,5 +1,8 @@
 package io.github.jhipster.sample.config;
 
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.TraceContext;
+import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,15 +28,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * chain (order {@code -100}), ensuring that the {@code SecurityContextHolder}
  * is populated before {@code userId} is resolved.</p>
  *
- * <p>The filter also echoes the request ID back on the response via the
- * {@code X-Request-ID} header so that callers can correlate their client-side
- * logs with server-side traces.</p>
+ * <p>The filter also populates {@code traceId} and {@code spanId} from the
+ * Micrometer {@link Tracer} if a trace is active, and echoes the request ID back
+ * on the response via the {@code X-Request-ID} header so that callers can
+ * correlate their client-side logs with server-side traces.</p>
  */
 public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered {
 
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
     private static final String MDC_REQUEST_ID = "requestId";
     private static final String MDC_USER_ID = "userId";
+    private static final String MDC_TRACE_ID = "traceId";
+    private static final String MDC_SPAN_ID = "spanId";
+
+    private final Tracer tracer;
+
+    public CorrelationIdFilter(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     @Override
     public int getOrder() {
@@ -43,7 +55,8 @@ public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        try {
+        Span span = tracer.nextSpan().name("http " + request.getMethod() + " " + request.getRequestURI());
+        try (Tracer.SpanInScope scope = tracer.withSpan(span.start())) {
             String requestId = request.getHeader(REQUEST_ID_HEADER);
             if (requestId == null || requestId.isBlank()) {
                 requestId = UUID.randomUUID().toString();
@@ -51,13 +64,28 @@ public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered
 
             MDC.put(MDC_REQUEST_ID, requestId);
             MDC.put(MDC_USER_ID, resolveUserId());
+            populateTraceMdc();
 
             response.setHeader(REQUEST_ID_HEADER, requestId);
 
             filterChain.doFilter(request, response);
         } finally {
+            span.end();
             MDC.remove(MDC_REQUEST_ID);
             MDC.remove(MDC_USER_ID);
+            MDC.remove(MDC_TRACE_ID);
+            MDC.remove(MDC_SPAN_ID);
+        }
+    }
+
+    private void populateTraceMdc() {
+        Span currentSpan = tracer.currentSpan();
+        if (currentSpan != null) {
+            TraceContext context = currentSpan.context();
+            if (context != null) {
+                MDC.put(MDC_TRACE_ID, context.traceId());
+                MDC.put(MDC_SPAN_ID, context.spanId());
+            }
         }
     }
 

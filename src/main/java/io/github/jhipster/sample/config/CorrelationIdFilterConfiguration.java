@@ -1,9 +1,9 @@
 package io.github.jhipster.sample.config;
 
+import io.micrometer.tracing.Tracer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 
 /**
  * Registers the {@link CorrelationIdFilter} with the servlet container.
@@ -16,9 +16,9 @@ import org.springframework.core.Ordered;
 public class CorrelationIdFilterConfiguration {
 
     @Bean
-    public FilterRegistrationBean<CorrelationIdFilter> correlationIdFilterRegistration() {
+    public FilterRegistrationBean<CorrelationIdFilter> correlationIdFilterRegistration(Tracer tracer) {
         FilterRegistrationBean<CorrelationIdFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new CorrelationIdFilter());
+        registration.setFilter(new CorrelationIdFilter(tracer));
         registration.addUrlPatterns("/*");
         registration.setOrder(0);
         registration.setName("correlationIdFilter");
