@@ -40,11 +40,13 @@ public class Transfer implements Serializable {
     @Column(name = "description", length = 255)
     private String description;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_account_id", nullable = false)
     @JsonIgnoreProperties(value = { "operations" }, allowSetters = true)
     private BankAccount sourceAccount;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "destination_account_id", nullable = false)
     @JsonIgnoreProperties(value = { "operations" }, allowSetters = true)
