@@ -1,0 +1,27 @@
+{
+  "jhipsterSampleApplicationApp": {
+    "transfer": {
+      "home": {
+        "title": "Transfer Funds",
+        "subtitle": "Move money instantly between your accounts",
+        "createLabel": "New Transfer"
+      },
+      "backToAccounts": "Back to Accounts",
+      "sourceAccount": "From Account",
+      "destinationAccount": "To Account",
+      "amount": "Amount",
+      "description": "Description",
+      "optional": "(optional)",
+      "selectAccount": "Select an account...",
+      "available": "Available",
+      "date": "Date",
+      "recentTransfers": "Recent Transfers",
+      "noTransfers": "No transfers found for this account.",
+      "counterparty": "Account",
+      "transferAmount": "Amount",
+      "validation": {
+        "positiveAmount": "Amount must be greater than zero."
+      }
+    }
+  }
+}

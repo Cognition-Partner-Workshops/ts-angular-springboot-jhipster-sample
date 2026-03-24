@@ -38,6 +38,48 @@
         <button type="button" [routerLink]="['/bank-account', bankAccountRef.id, 'edit']" class="btn btn-primary">
           <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
         </button>
+
+        <button type="button" [routerLink]="['/transfer/new']" class="btn btn-success ms-2">
+          <fa-icon icon="exchange-alt" />&nbsp;<span jhiTranslate="jhipsterSampleApplicationApp.transfer.home.createLabel"
+            >New Transfer</span
+          >
+        </button>
+
+        <hr />
+
+        <h4 jhiTranslate="jhipsterSampleApplicationApp.transfer.recentTransfers">Recent Transfers</h4>
+
+        @if (recentTransfers().length > 0) {
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.date">Date</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.counterparty">Account</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.transferAmount">Amount</th>
+                  <th jhiTranslate="jhipsterSampleApplicationApp.transfer.description">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (transfer of recentTransfers(); track transfer.id) {
+                  @let amount = getTransferAmount(transfer, bankAccountRef.id);
+                  <tr>
+                    <td>{{ transfer.date | date: 'medium' }}</td>
+                    <td>{{ getCounterpartyName(transfer, bankAccountRef.id) }}</td>
+                    <td [class]="amount < 0 ? 'text-danger' : 'text-success'">
+                      {{ amount >= 0 ? '+' : '' }}{{ amount | number: '1.2-2' }}
+                    </td>
+                    <td>{{ transfer.description }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="alert alert-info" jhiTranslate="jhipsterSampleApplicationApp.transfer.noTransfers">
+            No transfers found for this account.
+          </div>
+        }
       </div>
     }
   </div>

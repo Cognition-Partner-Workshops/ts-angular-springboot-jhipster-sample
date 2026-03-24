@@ -1,0 +1,136 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div class="mb-3">
+      <a routerLink="/bank-account" class="text-decoration-none">
+        <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="jhipsterSampleApplicationApp.transfer.backToAccounts">Back to Accounts</span>
+      </a>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2 jhiTranslate="jhipsterSampleApplicationApp.transfer.home.title">Transfer Funds</h2>
+        <p class="text-muted" jhiTranslate="jhipsterSampleApplicationApp.transfer.home.subtitle">
+          Move money instantly between your accounts
+        </p>
+        <hr />
+
+        <jhi-alert-error />
+
+        <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label
+                class="form-label fw-bold"
+                for="field_sourceAccount"
+                jhiTranslate="jhipsterSampleApplicationApp.transfer.sourceAccount"
+              >
+                From Account
+              </label>
+              <select
+                class="form-select"
+                id="field_sourceAccount"
+                data-cy="sourceAccount"
+                formControlName="sourceAccount"
+                [compareWith]="compareBankAccount"
+              >
+                <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.transfer.selectAccount">Select an account...</option>
+                @for (account of accounts(); track account.id) {
+                  <option [ngValue]="account">{{ account.name }} - ${{ account.balance?.toFixed(2) }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label
+                class="form-label fw-bold"
+                for="field_destinationAccount"
+                jhiTranslate="jhipsterSampleApplicationApp.transfer.destinationAccount"
+              >
+                To Account
+              </label>
+              <select
+                class="form-select"
+                id="field_destinationAccount"
+                data-cy="destinationAccount"
+                formControlName="destinationAccount"
+                [compareWith]="compareBankAccount"
+              >
+                <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.transfer.selectAccount">Select an account...</option>
+                @for (account of filteredDestinationAccounts; track account.id) {
+                  <option [ngValue]="account">{{ account.name }} - ${{ account.balance?.toFixed(2) }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-bold" for="field_amount" jhiTranslate="jhipsterSampleApplicationApp.transfer.amount">
+                Amount
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="amount"
+                  id="field_amount"
+                  data-cy="amount"
+                  formControlName="amount"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              @if (availableBalance !== null) {
+                <small class="form-text text-muted">
+                  <span jhiTranslate="jhipsterSampleApplicationApp.transfer.available">Available</span>: ${{ availableBalance.toFixed(2) }}
+                </small>
+              }
+              @let amountRef = editForm.get('amount')!;
+              @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+                <div>
+                  @if (amountRef.errors?.required) {
+                    <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+                  }
+                  @if (amountRef.errors?.min) {
+                    <small class="form-text text-danger" jhiTranslate="jhipsterSampleApplicationApp.transfer.validation.positiveAmount">
+                      Amount must be greater than zero.
+                    </small>
+                  }
+                </div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold" for="field_description" jhiTranslate="jhipsterSampleApplicationApp.transfer.description">
+                Description
+              </label>
+              <span class="text-muted ms-1" jhiTranslate="jhipsterSampleApplicationApp.transfer.optional">(optional)</span>
+              <input
+                type="text"
+                class="form-control"
+                name="description"
+                id="field_description"
+                data-cy="description"
+                formControlName="description"
+                maxlength="255"
+                placeholder="e.g. Monthly savings transfer"
+              />
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="previousState()" data-cy="entityCreateCancelButton">
+              <span jhiTranslate="entity.action.cancel">Cancel</span>
+            </button>
+            <button type="submit" [disabled]="editForm.invalid || isSaving()" class="btn btn-primary" data-cy="entityCreateSaveButton">
+              {{ transferButtonAmount }}
+              <fa-icon icon="arrow-right" />
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

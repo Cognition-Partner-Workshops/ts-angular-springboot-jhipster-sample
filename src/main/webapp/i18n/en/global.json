@@ -11,7 +11,8 @@
         "adminAuthority": "Authority",
         "bankAccount": "Bank Account",
         "label": "Label",
-        "operation": "Operation"
+        "operation": "Operation",
+        "transfer": "Transfer Funds"
       },
       "account": {
         "main": "Account",
