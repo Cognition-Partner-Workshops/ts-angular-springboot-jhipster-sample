@@ -56,7 +56,8 @@ public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered
 
             filterChain.doFilter(request, response);
         } finally {
-            MDC.clear();
+            MDC.remove(MDC_REQUEST_ID);
+            MDC.remove(MDC_USER_ID);
         }
     }
 
