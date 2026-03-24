@@ -24,7 +24,8 @@ import { TransferService, EntityResponseType } from '../service/transfer.service
 export class TransferUpdate implements OnInit {
   isSaving = signal(false);
 
-  bankAccounts = signal<IBankAccount[]>([]);
+  myBankAccounts = signal<IBankAccount[]>([]);
+  allBankAccounts = signal<IBankAccount[]>([]);
   filteredDestinationAccounts = signal<IBankAccount[]>([]);
 
   editForm = new FormGroup({
@@ -102,20 +103,29 @@ export class TransferUpdate implements OnInit {
   }
 
   private loadBankAccounts(): void {
+    // Load current user's accounts for the source dropdown
+    this.bankAccountService
+      .queryMyAccounts()
+      .pipe(map((res: HttpResponse<IBankAccount[]>) => res.body ?? []))
+      .subscribe((accounts: IBankAccount[]) => {
+        this.myBankAccounts.set(accounts);
+      });
+
+    // Load all accounts for the destination dropdown
     this.bankAccountService
       .query()
       .pipe(map((res: HttpResponse<IBankAccount[]>) => res.body ?? []))
       .subscribe((accounts: IBankAccount[]) => {
-        this.bankAccounts.set(accounts);
+        this.allBankAccounts.set(accounts);
         this.filteredDestinationAccounts.set(accounts);
       });
   }
 
   private updateDestinationAccounts(source: IBankAccount | null): void {
     if (source) {
-      this.filteredDestinationAccounts.set(this.bankAccounts().filter(a => a.id !== source.id));
+      this.filteredDestinationAccounts.set(this.allBankAccounts().filter(a => a.id !== source.id));
     } else {
-      this.filteredDestinationAccounts.set(this.bankAccounts());
+      this.filteredDestinationAccounts.set(this.allBankAccounts());
     }
 
     const currentDest = this.editForm.get('destinationAccount')?.value;

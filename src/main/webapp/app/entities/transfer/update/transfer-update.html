@@ -22,7 +22,7 @@
             [compareWith]="compareBankAccount"
           >
             <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.transfer.selectAccount">-- Select Account --</option>
-            @for (account of bankAccounts(); track account.id) {
+            @for (account of myBankAccounts(); track account.id) {
               <option [ngValue]="account">{{ account.name }} - {{ account.balance | number: '1.2-2' }}</option>
             }
           </select>

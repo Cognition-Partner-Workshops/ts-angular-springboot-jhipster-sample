@@ -156,6 +156,17 @@ public class BankAccountResource {
     }
 
     /**
+     * {@code GET  /bank-accounts/my-accounts} : get bank accounts owned by the current user.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of bankAccounts in body.
+     */
+    @GetMapping("/my-accounts")
+    public List<BankAccount> getMyBankAccounts() {
+        LOG.debug("REST request to get current user's BankAccounts");
+        return bankAccountRepository.findByUserIsCurrentUser();
+    }
+
+    /**
      * {@code GET  /bank-accounts/:id} : get the "id" bankAccount.
      *
      * @param id the id of the bankAccount to retrieve.
