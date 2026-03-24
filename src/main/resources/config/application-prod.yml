@@ -24,6 +24,9 @@ management:
     metrics:
       export:
         enabled: true
+  tracing:
+    sampling:
+      probability: 0.1
 
 spring:
   devtools:
