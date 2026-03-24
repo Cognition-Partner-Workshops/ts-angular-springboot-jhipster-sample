@@ -632,7 +632,7 @@ This starts:
 | Property       | Value                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------------ |
 | **Severity**   | warning                                                                                                |
-| **Expression** | `rate(security_authentication_invalid_tokens_total[5m]) > 1`                                           |
+| **Expression** | `rate(security_authentication_invalid_tokens_errors_total[5m]) > 1`                                    |
 | **Duration**   | 5 minutes                                                                                              |
 | **Meaning**    | The rate of invalid JWT token presentations exceeds 1 per second, indicating potential security issues |
 
@@ -649,7 +649,7 @@ This starts:
 
 1. Check which type of invalid tokens dominate:
    ```promql
-   sum by (cause) (rate(security_authentication_invalid_tokens_total[5m]))
+      sum by (cause) (rate(security_authentication_invalid_tokens_errors_total[5m]))
    ```
    Causes are: `invalid-signature`, `expired`, `unsupported`, `malformed`
 2. Check access logs for source IPs of failed authentications:
@@ -1420,7 +1420,7 @@ hikaricp_connections_pending{pool="Hikari"}
 rate(jvm_gc_pause_seconds_sum[5m])
 
 # Invalid token rate by cause
-sum by (cause) (rate(security_authentication_invalid_tokens_total[5m]))
+sum by (cause) (rate(security_authentication_invalid_tokens_errors_total[5m]))
 
 # Logback error event rate
 rate(logback_events_total{level="error"}[5m])
