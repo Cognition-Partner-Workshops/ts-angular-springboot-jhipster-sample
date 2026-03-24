@@ -1,8 +1,8 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.BankAccount;
-import io.github.jhipster.sample.management.BankAccountMetricsService;
 import io.github.jhipster.sample.repository.BankAccountRepository;
+import io.github.jhipster.sample.service.BankAccountMetricsService;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

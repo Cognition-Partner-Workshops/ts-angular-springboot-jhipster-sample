@@ -8,9 +8,9 @@ import org.springframework.core.Ordered;
 /**
  * Registers the {@link CorrelationIdFilter} with the servlet container.
  *
- * <p>The filter is given the highest feasible precedence so that MDC context
- * is available to every downstream filter and servlet, including Spring
- * Security's filter chain.</p>
+ * <p>The filter runs at order {@code 0}, after Spring Security's filter chain
+ * (order {@code -100}), so that the authenticated principal is available in
+ * {@code SecurityContextHolder} when the filter resolves {@code userId}.</p>
  */
 @Configuration
 public class CorrelationIdFilterConfiguration {
@@ -20,7 +20,7 @@ public class CorrelationIdFilterConfiguration {
         FilterRegistrationBean<CorrelationIdFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new CorrelationIdFilter());
         registration.addUrlPatterns("/*");
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        registration.setOrder(0);
         registration.setName("correlationIdFilter");
         return registration;
     }

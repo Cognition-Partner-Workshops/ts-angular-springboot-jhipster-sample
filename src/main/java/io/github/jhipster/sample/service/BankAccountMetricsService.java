@@ -1,11 +1,9 @@
-package io.github.jhipster.sample.management;
+package io.github.jhipster.sample.service;
 
-import io.github.jhipster.sample.domain.BankAccount;
 import io.github.jhipster.sample.repository.BankAccountRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,9 +33,7 @@ public class BankAccountMetricsService {
             .description("Current number of bank accounts")
             .register(meterRegistry);
 
-        Gauge.builder("bank.account.total.balance", () ->
-            bankAccountRepository.findAll().stream().map(BankAccount::getBalance).reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue()
-        )
+        Gauge.builder("bank.account.total.balance", () -> bankAccountRepository.sumAllBalances().doubleValue())
             .description("Sum of all bank account balances")
             .register(meterRegistry);
     }

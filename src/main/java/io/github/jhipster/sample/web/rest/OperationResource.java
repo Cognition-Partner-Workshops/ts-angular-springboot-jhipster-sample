@@ -1,8 +1,8 @@
 package io.github.jhipster.sample.web.rest;
 
 import io.github.jhipster.sample.domain.Operation;
-import io.github.jhipster.sample.management.OperationMetricsService;
 import io.github.jhipster.sample.repository.OperationRepository;
+import io.github.jhipster.sample.service.OperationMetricsService;
 import io.github.jhipster.sample.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

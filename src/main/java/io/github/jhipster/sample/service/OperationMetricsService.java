@@ -1,4 +1,4 @@
-package io.github.jhipster.sample.management;
+package io.github.jhipster.sample.service;
 
 import io.github.jhipster.sample.repository.OperationRepository;
 import io.micrometer.core.instrument.Counter;

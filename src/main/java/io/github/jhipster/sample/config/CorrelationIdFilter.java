@@ -21,6 +21,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * Security context, and places both values into MDC so that every log statement
  * emitted while processing the request carries them automatically.</p>
  *
+ * <p>The filter runs at order {@code 0}, which is after Spring Security's filter
+ * chain (order {@code -100}), ensuring that the {@code SecurityContextHolder}
+ * is populated before {@code userId} is resolved.</p>
+ *
  * <p>The filter also echoes the request ID back on the response via the
  * {@code X-Request-ID} header so that callers can correlate their client-side
  * logs with server-side traces.</p>
@@ -33,7 +37,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter implements Ordered
 
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE + 1;
+        return 0;
     }
 
     @Override
