@@ -32,7 +32,9 @@ public class OperationMetricsService {
             .publishPercentileHistogram(true)
             .register(meterRegistry);
 
-        Gauge.builder("operation.count", operationRepository::count).description("Current number of operations").register(meterRegistry);
+        Gauge.builder("operation.count", operationRepository, repo -> (double) repo.count())
+            .description("Current number of operations")
+            .register(meterRegistry);
     }
 
     public void recordOperation(BigDecimal amount) {

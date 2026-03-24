@@ -29,11 +29,11 @@ public class BankAccountMetricsService {
             .description("Total number of bank accounts deleted")
             .register(meterRegistry);
 
-        Gauge.builder("bank.account.count", bankAccountRepository::count)
+        Gauge.builder("bank.account.count", bankAccountRepository, repo -> (double) repo.count())
             .description("Current number of bank accounts")
             .register(meterRegistry);
 
-        Gauge.builder("bank.account.total.balance", () -> bankAccountRepository.sumAllBalances().doubleValue())
+        Gauge.builder("bank.account.total.balance", bankAccountRepository, repo -> repo.sumAllBalances().doubleValue())
             .description("Sum of all bank account balances")
             .register(meterRegistry);
     }
