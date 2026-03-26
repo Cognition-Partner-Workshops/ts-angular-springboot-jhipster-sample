@@ -16,9 +16,20 @@ import { AlertErrorModel } from './alert-error.model';
   templateUrl: './alert-error.html',
   imports: [NgbModule],
 })
+/**
+ * Renders danger/error alerts by listening for application and HTTP error events.
+ *
+ * Subscribes to two {@link EventManager} channels:
+ * - `jhipsterSampleApplicationApp.error` for custom application errors
+ * - `jhipsterSampleApplicationApp.httpError` for HTTP errors (broadcast by {@link errorHandlerInterceptor})
+ *
+ * Translates HTTP status codes and field validation errors into user-friendly messages.
+ */
 export class AlertError implements OnDestroy {
   alerts = signal<AlertModel[]>([]);
+  /** Subscription for custom application error events. */
   errorListener: Subscription;
+  /** Subscription for HTTP error events from the error handler interceptor. */
   httpErrorListener: Subscription;
 
   private readonly alertService = inject(AlertService);
@@ -60,10 +71,12 @@ export class AlertError implements OnDestroy {
     alert.close?.(this.alerts());
   }
 
+  /** Creates a danger alert with optional i18n translation support. */
   private addErrorAlert(message?: string, translationKey?: string, translationParams?: Record<string, unknown>): void {
     this.alertService.addAlert({ type: 'danger', message, translationKey, translationParams }, this.alerts());
   }
 
+  /** Routes HTTP errors to specialized handlers based on status code. */
   private handleHttpError(response: EventWithContent<unknown> | string): void {
     const httpErrorResponse = (response as EventWithContent<HttpErrorResponse>).content;
     switch (httpErrorResponse.status) {
@@ -86,6 +99,7 @@ export class AlertError implements OnDestroy {
     }
   }
 
+  /** Handles 400 errors: checks for alert headers, field errors, or generic messages. */
   private handleBadRequest(httpErrorResponse: HttpErrorResponse): void {
     const headers = Object.fromEntries(httpErrorResponse.headers.keys().map(key => [key, httpErrorResponse.headers.getAll(key)]));
     const message = getMessageFromHeaders(headers);
@@ -107,6 +121,7 @@ export class AlertError implements OnDestroy {
     }
   }
 
+  /** Handles non-400/404 errors by displaying the server-provided message. */
   private handleDefaultError(httpErrorResponse: HttpErrorResponse): void {
     if (httpErrorResponse.error !== '' && httpErrorResponse.error.message) {
       this.addErrorAlert(
@@ -119,6 +134,7 @@ export class AlertError implements OnDestroy {
     }
   }
 
+  /** Converts Spring Boot field validation errors into translated alert messages. */
   private handleFieldsError(httpErrorResponse: HttpErrorResponse): void {
     const { fieldErrors } = httpErrorResponse.error;
     for (const fieldError of fieldErrors) {

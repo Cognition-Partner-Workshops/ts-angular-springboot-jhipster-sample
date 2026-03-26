@@ -12,14 +12,11 @@ import { TranslateDirective } from 'app/shared/language';
   templateUrl: './metrics-garbagecollector.html',
   imports: [NgbModule, DecimalPipe, TranslateDirective, TranslateModule],
 })
+/** Displays JVM garbage collector pause counts and total pause time. */
 export class MetricsGarbageCollector {
-  /**
-   * Object containing garbage collector related metrics
-   */
+  /** GC metrics including collection count and cumulative pause time. */
   garbageCollectorMetrics = input<GarbageCollector>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 }

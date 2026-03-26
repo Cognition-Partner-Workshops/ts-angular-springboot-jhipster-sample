@@ -13,6 +13,10 @@ export type PartialUpdateLabel = Partial<ILabel> & Pick<ILabel, 'id'>;
 export type EntityResponseType = HttpResponse<ILabel>;
 export type EntityArrayResponseType = HttpResponse<ILabel[]>;
 
+/**
+ * HTTP service for Label CRUD operations against the Spring Boot REST API.
+ * Provides standard create/read/update/delete methods plus collection utilities.
+ */
 @Injectable({ providedIn: 'root' })
 export class LabelService {
   protected readonly http = inject(HttpClient);
@@ -20,31 +24,37 @@ export class LabelService {
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/labels');
 
+  /** Creates a new label via POST. */
   create(label: NewLabel): Observable<EntityResponseType> {
     return this.http.post<ILabel>(this.resourceUrl, label, { observe: 'response' });
   }
 
+  /** Fully updates an existing label via PUT. */
   update(label: ILabel): Observable<EntityResponseType> {
     return this.http.put<ILabel>(`${this.resourceUrl}/${encodeURIComponent(this.getLabelIdentifier(label))}`, label, {
       observe: 'response',
     });
   }
 
+  /** Partially updates a label via PATCH. */
   partialUpdate(label: PartialUpdateLabel): Observable<EntityResponseType> {
     return this.http.patch<ILabel>(`${this.resourceUrl}/${encodeURIComponent(this.getLabelIdentifier(label))}`, label, {
       observe: 'response',
     });
   }
 
+  /** Fetches a single label by id. */
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<ILabel>(`${this.resourceUrl}/${encodeURIComponent(id)}`, { observe: 'response' });
   }
 
+  /** Lists labels with optional pagination/sort parameters. */
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http.get<ILabel[]>(this.resourceUrl, { params: options, observe: 'response' });
   }
 
+  /** Deletes a label by id. */
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${encodeURIComponent(id)}`, { observe: 'response' });
   }

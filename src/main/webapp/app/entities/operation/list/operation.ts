@@ -39,6 +39,12 @@ import { EntityArrayResponseType, OperationService } from '../service/operation.
     InfiniteScrollDirective,
   ],
 })
+/**
+ * List view for Operation entities with infinite scroll pagination.
+ *
+ * Loads operations in pages and appends new results as the user scrolls.
+ * Supports sortable columns with URL-synced sort state.
+ */
 export class Operation implements OnInit {
   subscription: Subscription | null = null;
   operations = signal<IOperation[]>([]);

@@ -16,6 +16,13 @@ import { ConfigurationService } from './configuration.service';
   templateUrl: './configuration.html',
   imports: [FontAwesomeModule, FormsModule, SortDirective, SortByDirective, KeyValuePipe, JsonPipe, TranslateDirective, TranslateModule],
 })
+/**
+ * Admin view for inspecting Spring Boot configuration properties
+ * and environment property sources.
+ *
+ * Displays a filterable, sortable table of `@ConfigurationProperties` beans
+ * and a list of all property sources with their key-value pairs.
+ */
 export default class Configuration implements OnInit {
   allBeans = signal<Bean[] | undefined>(undefined);
   beansFilter = signal<string>('');

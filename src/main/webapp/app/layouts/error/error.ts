@@ -11,6 +11,10 @@ import { TranslateDirective } from 'app/shared/language';
   imports: [TranslateDirective, TranslateModule],
   templateUrl: './error.html',
 })
+/**
+ * Generic error page that displays a translated error message.
+ * Used for 403, 404, and other error routes.
+ */
 export default class Error implements OnInit, OnDestroy {
   errorMessage = signal<string | undefined>(undefined);
   errorKey?: string;
@@ -35,6 +39,7 @@ export default class Error implements OnInit, OnDestroy {
     }
   }
 
+  /** Fetches the translated error message and updates the display signal. */
   private getErrorMessageTranslation(): void {
     this.errorMessage.set('');
     if (this.errorKey) {

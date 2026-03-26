@@ -1,5 +1,10 @@
 import { HttpParams } from '@angular/common/http';
 
+/**
+ * Converts a plain object of request parameters into Angular {@link HttpParams}.
+ * Flattens array values so each element is appended as a separate query param.
+ * Skips null/undefined values and empty strings.
+ */
 export const createRequestOption = (req?: any): HttpParams => {
   let options: HttpParams = new HttpParams();
 

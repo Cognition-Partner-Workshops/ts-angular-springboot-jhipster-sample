@@ -1,3 +1,4 @@
+/** Aggregated application metrics from the `/management/jhimetrics` endpoint. */
 export interface MetricsModel {
   jvm: Record<string, JvmMetrics>;
   databases: Databases;
@@ -8,12 +9,14 @@ export interface MetricsModel {
   processMetrics: ProcessMetrics;
 }
 
+/** JVM memory pool metrics (committed, max, used bytes). */
 export interface JvmMetrics {
   committed: number;
   max: number;
   used: number;
 }
 
+/** Database connection pool metrics from HikariCP. */
 export interface Databases {
   min: Value;
   idle: Value;
@@ -43,6 +46,7 @@ export interface MetricsWithPercentile {
   '0.95': number;
 }
 
+/** HTTP request metrics grouped by status code. */
 export interface HttpServerRequests {
   all: {
     count: number;
@@ -56,6 +60,7 @@ export interface MaxMeanCount {
   count: number;
 }
 
+/** Ehcache statistics for a single cache region. */
 export interface CacheMetrics {
   'cache.gets.miss': number;
   'cache.puts': number;
@@ -64,6 +69,7 @@ export interface CacheMetrics {
   'cache.evictions': number;
 }
 
+/** JVM garbage collection and class loading statistics. */
 export interface GarbageCollector {
   'jvm.gc.max.data.size': number;
   'jvm.gc.pause': MetricsWithPercentile;
@@ -84,6 +90,7 @@ export enum HttpMethod {
   Delete = 'DELETE',
 }
 
+/** System and process-level CPU, file descriptor, and uptime metrics. */
 export interface ProcessMetrics {
   'system.cpu.usage': number;
   'system.cpu.count': number;
@@ -95,10 +102,12 @@ export interface ProcessMetrics {
   'process.uptime': number;
 }
 
+/** Response from the `/management/threaddump` endpoint. */
 export interface ThreadDump {
   threads: Thread[];
 }
 
+/** Detailed information about a single JVM thread. */
 export interface Thread {
   threadName: string;
   threadId: number;

@@ -7,6 +7,7 @@ import passwordResetInitRoute from './password-reset/init/password-reset-init.ro
 import registerRoute from './register/register.route';
 import settingsRoute from './settings/settings.route';
 
+/** Aggregated routes for all account management features (activation, password, registration, settings). */
 const accountRoutes: Routes = [
   activateRoute,
   passwordRoute,

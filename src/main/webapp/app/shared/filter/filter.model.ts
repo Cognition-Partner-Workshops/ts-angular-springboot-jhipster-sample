@@ -2,6 +2,7 @@ import { ParamMap } from '@angular/router';
 
 import { Subject } from 'rxjs';
 
+/** Contract for a collection of active query-parameter filters. */
 export interface IFilterOptions {
   readonly filterChanges: Subject<FilterOption[]>;
   get filterOptions(): IFilterOption[];
@@ -12,12 +13,17 @@ export interface IFilterOptions {
   removeFilter(name: string, value: string): boolean;
 }
 
+/** A single named filter with one or more active values. */
 export interface IFilterOption {
   name: string;
   values: string[];
   nameAsQueryParam(): string;
 }
 
+/**
+ * Concrete filter holding a unique set of string values for a named criterion.
+ * Serializes to query parameters in the form `filter[name]=value`.
+ */
 export class FilterOption implements IFilterOption {
   constructor(
     public name: string,
@@ -67,6 +73,11 @@ export class FilterOption implements IFilterOption {
   }
 }
 
+/**
+ * Manages a collection of {@link FilterOption} instances, emitting change
+ * notifications via {@link filterChanges} so list components can react
+ * to filter additions, removals, or resets.
+ */
 export class FilterOptions implements IFilterOptions {
   readonly filterChanges = new Subject<FilterOption[]>();
   private _filterOptions: FilterOption[];
@@ -92,6 +103,7 @@ export class FilterOptions implements IFilterOptions {
     return hasFields;
   }
 
+  /** Parses `filter[name]=value` query parameters and rebuilds the filter set. Returns true if filters changed. */
   initializeFromParams(params: ParamMap): boolean {
     const oldFilters: FilterOptions = this.clone();
 

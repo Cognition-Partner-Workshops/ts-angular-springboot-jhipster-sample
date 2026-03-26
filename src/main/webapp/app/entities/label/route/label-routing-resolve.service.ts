@@ -8,6 +8,10 @@ import { mergeMap } from 'rxjs/operators';
 import { ILabel } from '../label.model';
 import { LabelService } from '../service/label.service';
 
+/**
+ * Route resolver that pre-fetches a Label entity before route activation.
+ * Returns null for create routes (no id param) or navigates to 404 if the entity is not found.
+ */
 const labelResolve = (route: ActivatedRouteSnapshot): Observable<null | ILabel> => {
   const id = route.params.id;
   if (id) {

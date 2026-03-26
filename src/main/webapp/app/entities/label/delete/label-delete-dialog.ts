@@ -15,16 +15,19 @@ import { LabelService } from '../service/label.service';
   templateUrl: './label-delete-dialog.html',
   imports: [TranslateDirective, TranslateModule, FormsModule, FontAwesomeModule, AlertError],
 })
+/** Modal dialog confirming deletion of a Label entity. */
 export class LabelDeleteDialog {
   label?: ILabel;
 
   protected labelService = inject(LabelService);
   protected activeModal = inject(NgbActiveModal);
 
+  /** Dismisses the dialog without deleting. */
   cancel(): void {
     this.activeModal.dismiss();
   }
 
+  /** Deletes the entity and closes the dialog with a success event. */
   confirmDelete(id: number): void {
     this.labelService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);

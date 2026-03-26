@@ -11,6 +11,10 @@ import { IAuthority, NewAuthority } from '../authority.model';
 export type EntityResponseType = HttpResponse<IAuthority>;
 export type EntityArrayResponseType = HttpResponse<IAuthority[]>;
 
+/**
+ * HTTP service for Authority (role) CRUD operations.
+ * Authorities are identified by name (string) rather than numeric id.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthorityService {
   protected readonly http = inject(HttpClient);

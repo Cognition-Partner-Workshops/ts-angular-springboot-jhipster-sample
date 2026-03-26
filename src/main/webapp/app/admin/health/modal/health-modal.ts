@@ -12,11 +12,13 @@ import { HealthDetails, HealthKey } from '../health.model';
   templateUrl: './health-modal.html',
   imports: [TranslateDirective, TranslateModule, KeyValuePipe],
 })
+/** Modal displaying detailed diagnostic information for a single health indicator. */
 export default class HealthModal {
   health?: { key: HealthKey; value: HealthDetails };
 
   private readonly activeModal = inject(NgbActiveModal);
 
+  /** Formats health detail values for display (e.g. bytes to GB/MB for disk space). */
   readableValue(value: any): string {
     if (this.health?.key === 'diskSpace') {
       // should display storage space in a human readable unit

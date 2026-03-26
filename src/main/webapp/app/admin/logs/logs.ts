@@ -17,6 +17,12 @@ import { LogsService } from './logs.service';
   templateUrl: './logs.html',
   imports: [TranslateDirective, TranslateModule, FontAwesomeModule, FormsModule, SortDirective, SortByDirective, SlicePipe],
 })
+/**
+ * Admin view for managing application log levels at runtime.
+ *
+ * Displays a filterable, sortable list of loggers with buttons
+ * to change each logger's level without restarting the application.
+ */
 export default class Logs implements OnInit {
   loggers = signal<Log[] | undefined>(undefined);
   isLoading = signal(false);
@@ -43,6 +49,7 @@ export default class Logs implements OnInit {
     this.findAndExtractLoggers();
   }
 
+  /** Changes a logger's level and reloads the list to reflect the update. */
   changeLevel(name: string, level: Level): void {
     this.logsService.changeLevel(name, level).subscribe(() => this.findAndExtractLoggers());
   }

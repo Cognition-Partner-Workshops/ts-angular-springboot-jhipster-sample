@@ -35,6 +35,12 @@ import { MetricsService } from './metrics.service';
     MetricsSystem,
   ],
 })
+/**
+ * Admin metrics dashboard displaying JVM, HTTP, cache, datasource,
+ * garbage collection, and thread information.
+ *
+ * Uses OnPush change detection; explicitly marks for check after async data loads.
+ */
 export default class Metrics implements OnInit {
   metrics = signal<MetricsModel | undefined>(undefined);
   threads = signal<Thread[] | undefined>(undefined);
@@ -47,6 +53,7 @@ export default class Metrics implements OnInit {
     this.refresh();
   }
 
+  /** Fetches metrics and thread dump in parallel and updates the view. */
   refresh(): void {
     this.updatingMetrics.set(true);
     combineLatest([this.metricsService.getMetrics(), this.metricsService.threadDump()]).subscribe(([metrics, threadDump]) => {
@@ -57,6 +64,7 @@ export default class Metrics implements OnInit {
     });
   }
 
+  /** Checks whether a metrics section has data to display. */
   metricsKeyExistsAndObjectNotEmpty(key: keyof MetricsModel): boolean {
     return Boolean(this.metrics()?.[key] && JSON.stringify(this.metrics()?.[key]) !== '{}');
   }

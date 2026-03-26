@@ -32,6 +32,12 @@ import { EntityArrayResponseType, LabelService } from '../service/label.service'
     TranslateModule,
   ],
 })
+/**
+ * List view for Label entities.
+ *
+ * Displays a sortable table of labels with create, view, edit,
+ * and delete actions. Sort state is synchronized with query parameters.
+ */
 export class Label implements OnInit {
   subscription: Subscription | null = null;
   labels = signal<ILabel[]>([]);

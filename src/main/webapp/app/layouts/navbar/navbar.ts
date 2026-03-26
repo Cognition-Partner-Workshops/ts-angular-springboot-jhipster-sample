@@ -33,12 +33,25 @@ import ActiveMenuDirective from './active-menu.directive';
     TranslateModule,
   ],
 })
+/**
+ * Application navigation bar.
+ *
+ * Displays entity links, admin menu (role-gated), account menu,
+ * language switcher, and the application version. Collapses on
+ * small screens via Bootstrap's responsive navbar.
+ */
 export default class Navbar implements OnInit {
+  /** Whether the app is running in production mode (hides dev-only features). */
   inProduction = signal(true);
+  /** Controls the Bootstrap navbar collapse state on small screens. */
   isNavbarCollapsed = signal(true);
+  /** Available languages for the language switcher dropdown. */
   readonly languages = LANGUAGES;
+  /** Whether the OpenAPI/Swagger docs link should be shown. */
   openAPIEnabled = signal(false);
+  /** Application version string displayed in the navbar. */
   readonly version: string;
+  /** Reactive signal of the current account for conditional rendering. */
   account = inject(AccountService).trackCurrentAccount();
 
   private readonly loginService = inject(LoginService);
@@ -63,11 +76,13 @@ export default class Navbar implements OnInit {
     });
   }
 
+  /** Switches the application language and persists the choice in session storage. */
   changeLanguage(languageKey: string): void {
     this.stateStorageService.storeLocale(languageKey);
     this.translateService.use(languageKey);
   }
 
+  /** Collapses the mobile navbar menu. */
   collapseNavbar(): void {
     this.isNavbarCollapsed.set(true);
   }
@@ -76,12 +91,14 @@ export default class Navbar implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  /** Logs out the user, collapses the navbar, and navigates to the home page. */
   logout(): void {
     this.collapseNavbar();
     this.loginService.logout();
     this.router.navigate(['']);
   }
 
+  /** Toggles the navbar collapse state on small screens. */
   toggleNavbar(): void {
     this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
   }

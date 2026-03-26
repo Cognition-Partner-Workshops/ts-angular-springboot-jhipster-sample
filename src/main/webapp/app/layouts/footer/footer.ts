@@ -7,4 +7,5 @@ import { TranslateDirective } from 'app/shared/language';
   templateUrl: './footer.html',
   imports: [TranslateDirective],
 })
+/** Simple footer component displaying a translated copyright notice. */
 export default class Footer {}

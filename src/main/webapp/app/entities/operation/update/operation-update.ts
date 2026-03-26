@@ -25,6 +25,12 @@ import { OperationFormGroup, OperationFormService } from './operation-form.servi
   templateUrl: './operation-update.html',
   imports: [TranslateDirective, TranslateModule, NgbModule, FontAwesomeModule, AlertError, ReactiveFormsModule],
 })
+/**
+ * Create/edit form for Operation entities.
+ *
+ * Loads bank account and label options for relationship dropdowns.
+ * Handles both create (POST) and edit (PUT) modes based on route data.
+ */
 export class OperationUpdate implements OnInit {
   isSaving = signal(false);
   operation: IOperation | null = null;
@@ -60,6 +66,7 @@ export class OperationUpdate implements OnInit {
     globalThis.history.back();
   }
 
+  /** Saves the form: creates a new entity or updates an existing one. */
   save(): void {
     this.isSaving.set(true);
     const operation = this.operationFormService.getOperation(this.editForm);

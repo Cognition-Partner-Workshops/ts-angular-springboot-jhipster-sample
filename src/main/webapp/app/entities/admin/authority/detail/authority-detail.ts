@@ -14,7 +14,9 @@ import { IAuthority } from '../authority.model';
   templateUrl: './authority-detail.html',
   imports: [FontAwesomeModule, NgbModule, Alert, AlertError, TranslateDirective, TranslateModule],
 })
+/** Read-only detail view for a single Authority (role) entity. */
 export class AuthorityDetail {
+  /** The authority to display, resolved by the route resolver. */
   authority = input<IAuthority | null>(null);
 
   previousState(): void {

@@ -37,6 +37,12 @@ import { User } from '../user-management.model';
     DatePipe,
   ],
 })
+/**
+ * Admin list view for user accounts with server-side pagination.
+ *
+ * Displays user details including activation status, authorities,
+ * and audit timestamps. Supports inline activation/deactivation toggle.
+ */
 export default class UserManagement implements OnInit {
   currentAccount = inject(AccountService).trackCurrentAccount();
   users = signal<User[] | null>(null);
@@ -56,6 +62,7 @@ export default class UserManagement implements OnInit {
     this.handleNavigation();
   }
 
+  /** Toggles a user's activation status and reloads the list. */
   setActive(user: User, isActivated: boolean): void {
     this.userService.update({ ...user, activated: isActivated }).subscribe(() => this.loadAll());
   }
@@ -64,6 +71,7 @@ export default class UserManagement implements OnInit {
     return item.id!;
   }
 
+  /** Opens the delete confirmation dialog for a user. */
   deleteUser(user: User): void {
     const modalRef = this.modalService.open(UserManagementDeleteDialog, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.user = user;
@@ -75,6 +83,7 @@ export default class UserManagement implements OnInit {
     });
   }
 
+  /** Fetches the current page of users from the backend. */
   loadAll(): void {
     this.isLoading.set(true);
     this.userService

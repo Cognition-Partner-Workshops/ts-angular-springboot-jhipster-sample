@@ -15,16 +15,19 @@ import { BankAccountService } from '../service/bank-account.service';
   templateUrl: './bank-account-delete-dialog.html',
   imports: [TranslateDirective, TranslateModule, FormsModule, FontAwesomeModule, AlertError],
 })
+/** Modal dialog confirming deletion of a BankAccount entity. */
 export class BankAccountDeleteDialog {
   bankAccount?: IBankAccount;
 
   protected bankAccountService = inject(BankAccountService);
   protected activeModal = inject(NgbActiveModal);
 
+  /** Dismisses the dialog without deleting. */
   cancel(): void {
     this.activeModal.dismiss();
   }
 
+  /** Deletes the entity and closes the dialog with a success event. */
   confirmDelete(id: number): void {
     this.bankAccountService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);

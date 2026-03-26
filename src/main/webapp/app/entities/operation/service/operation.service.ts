@@ -9,8 +9,10 @@ import { createRequestOption } from 'app/core/request/request-util';
 import { isPresent } from 'app/core/util/operators';
 import { IOperation, NewOperation } from '../operation.model';
 
+/** Partial update payload that always includes the entity id. */
 export type PartialUpdateOperation = Partial<IOperation> & Pick<IOperation, 'id'>;
 
+/** REST representation where dayjs dates are serialized as ISO strings. */
 type RestOf<T extends IOperation | NewOperation> = Omit<T, 'date'> & {
   date?: string | null;
 };
@@ -24,6 +26,10 @@ export type PartialUpdateRestOperation = RestOf<PartialUpdateOperation>;
 export type EntityResponseType = HttpResponse<IOperation>;
 export type EntityArrayResponseType = HttpResponse<IOperation[]>;
 
+/**
+ * HTTP service for Operation CRUD operations.
+ * Handles dayjs date conversion between client (dayjs) and server (ISO string) formats.
+ */
 @Injectable({ providedIn: 'root' })
 export class OperationService {
   protected readonly http = inject(HttpClient);
@@ -31,6 +37,7 @@ export class OperationService {
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/operations');
 
+  /** Creates a new operation via POST, converting dates to ISO format. */
   create(operation: NewOperation): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(operation);
     return this.http
@@ -38,6 +45,7 @@ export class OperationService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /** Fully updates an existing operation via PUT. */
   update(operation: IOperation): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(operation);
     return this.http
@@ -47,6 +55,7 @@ export class OperationService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /** Partially updates an operation via PATCH. */
   partialUpdate(operation: PartialUpdateOperation): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(operation);
     return this.http
@@ -56,12 +65,14 @@ export class OperationService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /** Fetches a single operation by id, converting dates from server format. */
   find(id: number): Observable<EntityResponseType> {
     return this.http
       .get<RestOperation>(`${this.resourceUrl}/${encodeURIComponent(id)}`, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  /** Lists operations with optional pagination/sort, converting dates. */
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http
@@ -101,6 +112,7 @@ export class OperationService {
     return operationCollection;
   }
 
+  /** Converts dayjs dates to ISO strings for the REST API. */
   protected convertDateFromClient<T extends IOperation | NewOperation | PartialUpdateOperation>(operation: T): RestOf<T> {
     return {
       ...operation,
@@ -108,6 +120,7 @@ export class OperationService {
     };
   }
 
+  /** Converts ISO date strings from the server back to dayjs instances. */
   protected convertDateFromServer(restOperation: RestOperation): IOperation {
     return {
       ...restOperation,

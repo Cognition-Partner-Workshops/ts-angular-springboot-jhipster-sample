@@ -17,6 +17,12 @@ import { StateStorageService } from 'app/core/auth/state-storage.service';
     }),
   ],
 })
+/**
+ * Root module for i18n support.
+ *
+ * Configures ngx-translate with an HTTP loader that fetches JSON translation
+ * files and restores the user's previously selected language from session storage.
+ */
 export class TranslationModule {
   private readonly translateService = inject(TranslateService);
   private readonly stateStorageService = inject(StateStorageService);

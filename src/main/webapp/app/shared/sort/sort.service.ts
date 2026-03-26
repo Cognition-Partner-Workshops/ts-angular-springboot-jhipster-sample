@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { SortState } from './sort-state';
 
+/** Utility service for client-side sorting with locale-aware string comparison. */
 @Injectable({ providedIn: 'root' })
 export class SortService {
   private readonly collator = new Intl.Collator(undefined, {
@@ -9,6 +10,7 @@ export class SortService {
     sensitivity: 'base',
   });
 
+  /** Returns a comparator function for the given sort state, with an optional fallback sort. */
   startSort({ predicate, order }: Required<SortState>, fallback?: Required<SortState>): (a: any, b: any) => number {
     const multiply = order === 'desc' ? -1 : 1;
     return (a: any, b: any) => {
@@ -20,6 +22,7 @@ export class SortService {
     };
   }
 
+  /** Parses a 'field,order' sort parameter string into a SortState object. */
   parseSortParam(sortParam: string | undefined): SortState {
     if (sortParam?.includes(',')) {
       const split = sortParam.split(',');
@@ -30,6 +33,7 @@ export class SortService {
     return { predicate: sortParam?.length ? sortParam : undefined };
   }
 
+  /** Serializes a SortState into query parameter strings (e.g. ['name,asc', 'id,asc']). */
   buildSortParam({ predicate, order }: SortState, fallback?: string): string[] {
     const sortParam = predicate && order ? [`${predicate},${order}`] : [];
     if (fallback && predicate !== fallback) {

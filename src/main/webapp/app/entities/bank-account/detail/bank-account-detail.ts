@@ -15,9 +15,12 @@ import { IBankAccount } from '../bank-account.model';
   templateUrl: './bank-account-detail.html',
   imports: [FontAwesomeModule, NgbModule, Alert, AlertError, TranslateDirective, TranslateModule, RouterLink],
 })
+/** Read-only detail view for a single BankAccount entity. */
 export class BankAccountDetail {
+  /** The bank account to display, resolved by the route resolver. */
   bankAccount = input<IBankAccount | null>(null);
 
+  /** Navigates back to the previous page via browser history. */
   previousState(): void {
     globalThis.history.back();
   }

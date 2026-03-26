@@ -5,11 +5,13 @@ import { Observable } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 
+/** Service for changing the authenticated user's password via the backend API. */
 @Injectable({ providedIn: 'root' })
 export class PasswordService {
   private readonly http = inject(HttpClient);
   private readonly applicationConfigService = inject(ApplicationConfigService);
 
+  /** Sends the current and new password to POST /api/account/change-password. */
   save(newPassword: string, currentPassword: string): Observable<{}> {
     return this.http.post(this.applicationConfigService.getEndpointFor('api/account/change-password'), { currentPassword, newPassword });
   }

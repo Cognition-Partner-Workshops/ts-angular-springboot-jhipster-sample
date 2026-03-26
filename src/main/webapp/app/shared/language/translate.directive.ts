@@ -39,6 +39,7 @@ export default class TranslateDirective implements OnChanges, OnInit, OnDestroy 
     this.directiveDestroyed.complete();
   }
 
+  /** Fetches the translated value and injects it into the host element's innerHTML. */
   private getTranslation(): void {
     this.translateService
       .get(this.jhiTranslate(), this.translateValues())

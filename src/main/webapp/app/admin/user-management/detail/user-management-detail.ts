@@ -13,6 +13,8 @@ import { User } from '../user-management.model';
   templateUrl: './user-management-detail.html',
   imports: [RouterLink, FontAwesomeModule, DatePipe, TranslateDirective, TranslateModule],
 })
+/** Read-only detail view for an admin user account. */
 export default class UserManagementDetail {
+  /** The user to display, resolved by the route resolver. */
   user = input<User | null>(null);
 }

@@ -14,6 +14,7 @@ import { PasswordResetFinishService } from './password-reset-finish.service';
   imports: [TranslateDirective, TranslateModule, RouterLink, ReactiveFormsModule, PasswordStrengthBar],
   templateUrl: './password-reset-finish.html',
 })
+/** Form for completing a password reset using the key from the reset email. */
 export default class PasswordResetFinish implements OnInit, AfterViewInit {
   newPassword = viewChild.required<ElementRef>('newPassword');
 
@@ -50,6 +51,7 @@ export default class PasswordResetFinish implements OnInit, AfterViewInit {
     this.newPassword().nativeElement.focus();
   }
 
+  /** Validates password confirmation and submits the new password with the reset key. */
   finishReset(): void {
     this.doNotMatch.set(false);
     this.error.set(false);

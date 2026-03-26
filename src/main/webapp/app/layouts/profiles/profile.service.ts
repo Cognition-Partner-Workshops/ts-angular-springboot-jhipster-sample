@@ -8,6 +8,7 @@ import { ApplicationConfigService } from 'app/core/config/application-config.ser
 
 import { InfoResponse, ProfileInfo } from './profile-info.model';
 
+/** Service that fetches and caches Spring Boot profile information from the `/management/info` endpoint. */
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly http = inject(HttpClient);
@@ -16,6 +17,7 @@ export class ProfileService {
   private readonly infoUrl = this.applicationConfigService.getEndpointFor('management/info');
   private profileInfo$?: Observable<ProfileInfo>;
 
+  /** Returns cached profile info, fetching it on first call. Determines production mode and ribbon display. */
   getProfileInfo(): Observable<ProfileInfo> {
     if (this.profileInfo$) {
       return this.profileInfo$;

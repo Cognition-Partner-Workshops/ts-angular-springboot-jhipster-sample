@@ -32,6 +32,13 @@ import { BankAccountService, EntityArrayResponseType } from '../service/bank-acc
     TranslateModule,
   ],
 })
+/**
+ * List view for BankAccount entities.
+ *
+ * Displays a sortable table of bank accounts with create, view, edit,
+ * and delete actions. Sort state is synchronized with query parameters
+ * for bookmarkable URLs.
+ */
 export class BankAccount implements OnInit {
   subscription: Subscription | null = null;
   bankAccounts = signal<IBankAccount[]>([]);
@@ -62,6 +69,7 @@ export class BankAccount implements OnInit {
       .subscribe();
   }
 
+  /** Opens the delete confirmation dialog; reloads the list on successful deletion. */
   delete(bankAccount: IBankAccount): void {
     const modalRef = this.modalService.open(BankAccountDeleteDialog, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.bankAccount = bankAccount;
@@ -74,6 +82,7 @@ export class BankAccount implements OnInit {
       .subscribe();
   }
 
+  /** Fetches the bank account list from the backend. */
   load(): void {
     this.queryBackend().subscribe((res: EntityArrayResponseType) => this.onResponseSuccess(res));
   }

@@ -6,6 +6,12 @@ import { tap } from 'rxjs/operators';
 import { AlertService } from 'app/core/util/alert.service';
 import { getMessageFromHeaders } from 'app/shared/jhipster/headers';
 
+/**
+ * Displays success toast notifications for server responses that include
+ * JHipster alert headers (X-jhipsterSampleApplicationApp-alert / X-jhipsterSampleApplicationApp-params).
+ *
+ * Supports both translation-key-based and plain-text alert messages.
+ */
 export const notificationInterceptor: HttpInterceptorFn = (req, next) => {
   const alertService = inject(AlertService);
 

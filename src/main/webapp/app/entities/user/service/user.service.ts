@@ -11,6 +11,10 @@ import { IUser } from '../user.model';
 export type EntityResponseType = HttpResponse<IUser>;
 export type EntityArrayResponseType = HttpResponse<IUser[]>;
 
+/**
+ * Read-only HTTP service for User entities.
+ * Used to populate owner dropdowns in entity forms (e.g. BankAccount).
+ */
 @Injectable({ providedIn: 'root' })
 export class UserService {
   protected readonly http = inject(HttpClient);
@@ -18,10 +22,12 @@ export class UserService {
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/users');
 
+  /** Fetches a single user by id. */
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<IUser>(`${this.resourceUrl}/${encodeURIComponent(id)}`, { observe: 'response' });
   }
 
+  /** Lists users with optional pagination/sort parameters. */
   query(req?: any): Observable<EntityArrayResponseType> {
     const options = createRequestOption(req);
     return this.http.get<IUser[]>(this.resourceUrl, { params: options, observe: 'response' });

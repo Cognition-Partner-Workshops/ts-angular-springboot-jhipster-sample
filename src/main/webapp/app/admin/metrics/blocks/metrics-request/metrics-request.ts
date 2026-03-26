@@ -14,15 +14,12 @@ import { TranslateDirective } from 'app/shared/language';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgbModule, KeyValuePipe, DecimalPipe, TranslateDirective, TranslateModule],
 })
+/** Displays HTTP request metrics grouped by response status code. */
 export class MetricsRequest {
-  /**
-   * Object containing http request related metrics
-   */
+  /** HTTP server request metrics with per-status-code breakdown. */
   requestMetrics = input<HttpServerRequests>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 
   filterNaN = (n: number): number => filterNaN(n);

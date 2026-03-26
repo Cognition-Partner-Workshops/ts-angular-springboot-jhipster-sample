@@ -7,6 +7,13 @@ import { tap } from 'rxjs/operators';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { LoginService } from 'app/login/login.service';
 
+/**
+ * Handles JWT session expiry by intercepting 401 responses.
+ *
+ * When a 401 is received on any endpoint except /api/account, stores the
+ * current URL for post-login redirect, logs the user out, and navigates
+ * to the login page.
+ */
 export const authExpiredInterceptor: HttpInterceptorFn = (req, next) => {
   const loginService = inject(LoginService);
   const stateStorageService = inject(StateStorageService);

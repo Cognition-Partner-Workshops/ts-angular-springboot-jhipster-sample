@@ -13,15 +13,12 @@ import { TranslateDirective } from 'app/shared/language';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DecimalPipe, TranslateDirective, TranslateModule],
 })
+/** Displays HikariCP connection pool statistics (active, idle, pending). */
 export class MetricsDatasource {
-  /**
-   * Object containing all datasource related metrics
-   */
+  /** Database connection pool metrics. */
   datasourceMetrics = input<Databases>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 
   filterNaN = (n: number): number => filterNaN(n);

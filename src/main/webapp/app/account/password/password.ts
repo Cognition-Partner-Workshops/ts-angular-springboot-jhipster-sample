@@ -16,6 +16,7 @@ import { PasswordService } from './password.service';
   imports: [TranslateDirective, TranslateModule, ReactiveFormsModule, PasswordStrengthBar],
   templateUrl: './password.html',
 })
+/** Password change form for authenticated users. Validates that new and confirm passwords match. */
 export default class Password implements OnInit {
   doNotMatch = signal(false);
   error = signal(false);
@@ -42,6 +43,7 @@ export default class Password implements OnInit {
     this.account = toSignal(account$, { injector: this.injector });
   }
 
+  /** Submits the password change if the new password and confirmation match. */
   changePassword(): void {
     this.error.set(false);
     this.success.set(false);

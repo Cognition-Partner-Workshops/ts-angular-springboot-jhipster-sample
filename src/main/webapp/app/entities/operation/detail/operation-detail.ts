@@ -16,7 +16,9 @@ import { IOperation } from '../operation.model';
   templateUrl: './operation-detail.html',
   imports: [FontAwesomeModule, NgbModule, Alert, AlertError, TranslateDirective, TranslateModule, RouterLink, FormatMediumDatetimePipe],
 })
+/** Read-only detail view for a single Operation entity. */
 export class OperationDetail {
+  /** The operation to display, resolved by the route resolver. */
   operation = input<IOperation | null>(null);
 
   previousState(): void {

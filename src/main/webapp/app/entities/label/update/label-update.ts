@@ -23,6 +23,12 @@ import { LabelFormGroup, LabelFormService } from './label-form.service';
   templateUrl: './label-update.html',
   imports: [TranslateDirective, TranslateModule, NgbModule, FontAwesomeModule, AlertError, ReactiveFormsModule],
 })
+/**
+ * Create/edit form for Label entities.
+ *
+ * Loads operation options for the relationship multi-select.
+ * Handles both create (POST) and edit (PUT) modes based on route data.
+ */
 export class LabelUpdate implements OnInit {
   isSaving = signal(false);
   label: ILabel | null = null;
@@ -54,6 +60,7 @@ export class LabelUpdate implements OnInit {
     globalThis.history.back();
   }
 
+  /** Saves the form: creates a new entity or updates an existing one. */
   save(): void {
     this.isSaving.set(true);
     const label = this.labelFormService.getLabel(this.editForm);

@@ -8,6 +8,10 @@ import { mergeMap } from 'rxjs/operators';
 import { IBankAccount } from '../bank-account.model';
 import { BankAccountService } from '../service/bank-account.service';
 
+/**
+ * Route resolver that pre-fetches a BankAccount entity before route activation.
+ * Returns null for create routes (no id param) or navigates to 404 if the entity is not found.
+ */
 const bankAccountResolve = (route: ActivatedRouteSnapshot): Observable<null | IBankAccount> => {
   const id = route.params.id;
   if (id) {

@@ -11,6 +11,11 @@ import { SortDirective } from './sort.directive';
     '(click)': 'onClick()',
   },
 })
+/**
+ * Column header directive that delegates click events to the parent
+ * {@link SortDirective} and updates its FontAwesome icon to reflect
+ * the current sort direction.
+ */
 export class SortByDirective {
   readonly jhiSortBy = input.required<string>();
 

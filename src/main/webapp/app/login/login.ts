@@ -13,9 +13,18 @@ import { TranslateDirective } from 'app/shared/language';
   imports: [TranslateDirective, TranslateModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
 })
+/**
+ * Login page component.
+ *
+ * Presents a username/password form with a remember-me checkbox.
+ * Redirects authenticated users to the home page on init.
+ * On successful login, navigates to a stored URL or the home page.
+ */
 export default class LoginComponent implements OnInit, AfterViewInit {
+  /** Reference to the username input element for auto-focus. */
   username = viewChild.required<ElementRef>('username');
 
+  /** Set to true when login fails, triggers the error message in the template. */
   authenticationError = signal(false);
 
   loginForm = new FormGroup({
@@ -41,6 +50,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
     this.username().nativeElement.focus();
   }
 
+  /** Submits login credentials; sets authenticationError on failure. */
   login(): void {
     this.loginService.login(this.loginForm.getRawValue()).subscribe({
       next: () => {

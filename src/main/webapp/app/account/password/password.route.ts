@@ -4,6 +4,7 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
 
 import Password from './password';
 
+/** Route definition for the password change page (requires authentication). */
 const passwordRoute: Route = {
   path: 'password',
   component: Password,

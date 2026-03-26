@@ -10,6 +10,7 @@ import { TranslateDirective } from 'app/shared/language';
   templateUrl: './password-strength-bar.html',
   styleUrl: './password-strength-bar.scss',
 })
+/** Visual indicator that scores password strength and renders colored bars from red (weak) to green (strong). */
 export default class PasswordStrengthBar {
   passwordToCheck = input<string>('');
 
@@ -39,6 +40,7 @@ export default class PasswordStrengthBar {
     });
   }
 
+  /** Calculates a numeric strength score based on length, character variety, and complexity. */
   measureStrength(p: string): number {
     let force = 0;
     const regex = /[$-/:-?{-~!"^_`[\]]/g; // "
@@ -64,6 +66,7 @@ export default class PasswordStrengthBar {
     return force;
   }
 
+  /** Maps a numeric strength score to a color index and hex color for the progress bars. */
   getColor(s: number): { idx: number; color: string } {
     let idx = 0;
     if (s > 10) {

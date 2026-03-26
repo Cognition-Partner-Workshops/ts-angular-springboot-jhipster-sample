@@ -23,6 +23,12 @@ const newUser: IUser = {
   templateUrl: './user-management-update.html',
   imports: [FindLanguageFromKeyPipe, TranslateDirective, TranslateModule, FontAwesomeModule, AlertError, ReactiveFormsModule],
 })
+/**
+ * Create/edit form for admin user management.
+ *
+ * Validates login pattern, email, and name length constraints.
+ * Loads available authorities for the role multi-select.
+ */
 export default class UserManagementUpdate implements OnInit {
   languages = LANGUAGES;
   authorities = signal<string[]>([]);
@@ -68,6 +74,7 @@ export default class UserManagementUpdate implements OnInit {
     globalThis.history.back();
   }
 
+  /** Saves the form: creates a new user or updates an existing one. */
   save(): void {
     this.isSaving.set(true);
     const user = this.editForm.getRawValue();

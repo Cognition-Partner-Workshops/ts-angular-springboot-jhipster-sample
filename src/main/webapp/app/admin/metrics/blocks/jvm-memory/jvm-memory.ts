@@ -12,14 +12,11 @@ import { TranslateDirective } from 'app/shared/language';
   templateUrl: './jvm-memory.html',
   imports: [NgbModule, KeyValuePipe, DecimalPipe, TranslateDirective, TranslateModule],
 })
+/** Displays JVM memory pool usage (heap and non-heap) with progress bars. */
 export class JvmMemory {
-  /**
-   * Object containing all jvm memory metrics
-   */
+  /** JVM memory metrics keyed by pool name (e.g. 'PS Eden Space'). */
   jvmMemoryMetrics = input<Record<string, JvmMetrics>>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 }

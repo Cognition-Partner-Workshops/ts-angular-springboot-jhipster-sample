@@ -13,9 +13,15 @@ import { TranslateDirective } from 'app/shared/language';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FontAwesomeModule, TranslateDirective, TranslateModule],
 })
+/**
+ * Modal that displays a filterable thread dump with per-state counts
+ * and color-coded badges for each thread's state.
+ */
 export class MetricsModalThreads implements OnInit {
   ThreadState = ThreadState;
+  /** Optional filter to show only threads in a specific state. */
   threadStateFilter?: ThreadState;
+  /** Full list of threads passed from the parent JvmThreads component. */
   threads?: Thread[];
   threadDumpAll = 0;
   threadDumpBlocked = 0;
@@ -43,6 +49,7 @@ export class MetricsModalThreads implements OnInit {
     this.threadDumpAll = this.threadDumpRunnable + this.threadDumpWaiting + this.threadDumpTimedWaiting + this.threadDumpBlocked;
   }
 
+  /** Returns a Bootstrap badge CSS class based on thread state severity. */
   getBadgeClass(threadState: ThreadState): string {
     if (threadState === ThreadState.Runnable) {
       return 'bg-success';
@@ -56,6 +63,7 @@ export class MetricsModalThreads implements OnInit {
     return '';
   }
 
+  /** Returns threads filtered by the currently selected state, or all threads if no filter. */
   getThreads(): Thread[] {
     return this.threads?.filter(thread => !this.threadStateFilter || thread.threadState === this.threadStateFilter) ?? [];
   }

@@ -15,7 +15,9 @@ import { ILabel } from '../label.model';
   templateUrl: './label-detail.html',
   imports: [FontAwesomeModule, NgbModule, Alert, AlertError, TranslateDirective, TranslateModule, RouterLink],
 })
+/** Read-only detail view for a single Label entity. */
 export class LabelDetail {
+  /** The label to display, resolved by the route resolver. */
   label = input<ILabel | null>(null);
 
   previousState(): void {

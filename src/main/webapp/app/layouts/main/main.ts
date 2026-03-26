@@ -15,6 +15,12 @@ import PageRibbon from '../profiles/page-ribbon';
   providers: [AppPageTitleStrategy],
   imports: [RouterOutlet, Footer, PageRibbon],
 })
+/**
+ * Root layout component wrapping the router outlet with the page ribbon and footer.
+ *
+ * On init, attempts to silently authenticate via a stored JWT and subscribes
+ * to language changes to update the page title, dayjs locale, and HTML lang attribute.
+ */
 export default class Main implements OnInit {
   private readonly renderer: Renderer2;
 

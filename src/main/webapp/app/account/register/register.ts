@@ -16,6 +16,7 @@ import { RegisterService } from './register.service';
   imports: [TranslateDirective, TranslateModule, RouterLink, ReactiveFormsModule, PasswordStrengthBar],
   templateUrl: './register.html',
 })
+/** Self-service registration form with login, email, and password fields plus duplicate-detection error handling. */
 export default class Register implements AfterViewInit {
   login = viewChild.required<ElementRef>('login');
 
@@ -56,6 +57,7 @@ export default class Register implements AfterViewInit {
     this.login().nativeElement.focus();
   }
 
+  /** Validates password confirmation and submits the registration request. */
   register(): void {
     this.doNotMatch.set(false);
     this.error.set(false);
@@ -73,6 +75,7 @@ export default class Register implements AfterViewInit {
     }
   }
 
+  /** Maps server error types (duplicate login/email) to specific UI error flags. */
   private processError(response: HttpErrorResponse): void {
     if (response.status === 400 && response.error.type === LOGIN_ALREADY_USED_TYPE) {
       this.errorUserExists.set(true);

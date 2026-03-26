@@ -13,6 +13,7 @@ import { ActivateService } from './activate.service';
   imports: [RouterLink, TranslateDirective, TranslateModule],
   templateUrl: './activate.html',
 })
+/** Account activation page that confirms a user's email via the activation key in the URL query params. */
 export default class Activate implements OnInit {
   error = signal(false);
   success = signal(false);

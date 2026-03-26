@@ -11,17 +11,15 @@ import { ProcessMetrics } from 'app/admin/metrics/metrics.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgbModule, DecimalPipe, DatePipe],
 })
+/** Displays system CPU, process uptime, and file descriptor metrics. */
 export class MetricsSystem {
-  /**
-   * Object containing thread related metrics
-   */
+  /** System and process-level metrics. */
   systemMetrics = input<ProcessMetrics>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 
+  /** Converts milliseconds to a human-readable duration string (e.g. '2 days 3 hours'). */
   convertMillisecondsToDuration(ms: number): string {
     const times = {
       year: 31557600000,

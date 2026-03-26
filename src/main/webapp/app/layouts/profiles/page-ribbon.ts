@@ -21,6 +21,7 @@ import { ProfileService } from './profile.service';
   styleUrl: './page-ribbon.scss',
   imports: [TranslateDirective, TranslateModule],
 })
+/** Displays a colored ribbon banner (e.g. 'Development') when the active Spring profile is configured for it. */
 export default class PageRibbon implements OnInit {
   ribbonEnvSignal?: Signal<string | undefined>;
   private readonly injector = inject(Injector);

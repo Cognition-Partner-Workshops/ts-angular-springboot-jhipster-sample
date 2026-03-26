@@ -15,16 +15,19 @@ import { OperationService } from '../service/operation.service';
   templateUrl: './operation-delete-dialog.html',
   imports: [TranslateDirective, TranslateModule, FormsModule, FontAwesomeModule, AlertError],
 })
+/** Modal dialog confirming deletion of an Operation entity. */
 export class OperationDeleteDialog {
   operation?: IOperation;
 
   protected operationService = inject(OperationService);
   protected activeModal = inject(NgbActiveModal);
 
+  /** Dismisses the dialog without deleting. */
   cancel(): void {
     this.activeModal.dismiss();
   }
 
+  /** Deletes the entity and closes the dialog with a success event. */
   confirmDelete(id: number): void {
     this.operationService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);

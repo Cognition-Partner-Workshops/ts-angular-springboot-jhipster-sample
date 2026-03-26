@@ -12,6 +12,7 @@ import { IFilterOptions } from './filter.model';
   imports: [TranslateDirective, TranslateModule, FontAwesomeModule],
   templateUrl: './filter.html',
 })
+/** Chip-bar component displaying active filters with clear buttons. */
 export default class Filter {
   readonly filters = input.required<IFilterOptions>();
 

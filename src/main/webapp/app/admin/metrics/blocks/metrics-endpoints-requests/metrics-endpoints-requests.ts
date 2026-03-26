@@ -8,14 +8,11 @@ import { Services } from 'app/admin/metrics/metrics.model';
   templateUrl: './metrics-endpoints-requests.html',
   imports: [KeyValuePipe, DecimalPipe],
 })
+/** Displays per-endpoint HTTP request counts and average response times. */
 export class MetricsEndpointsRequests {
-  /**
-   * Object containing service related metrics
-   */
+  /** Endpoint-level request metrics grouped by service. */
   endpointsRequestsMetrics = input<Services>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 }

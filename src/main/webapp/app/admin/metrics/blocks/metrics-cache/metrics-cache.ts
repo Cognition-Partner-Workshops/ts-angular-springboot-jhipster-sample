@@ -13,15 +13,12 @@ import { TranslateDirective } from 'app/shared/language';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [KeyValuePipe, DecimalPipe, TranslateDirective, TranslateModule],
 })
+/** Displays Ehcache hit/miss/eviction statistics per cache region. */
 export class MetricsCache {
-  /**
-   * Object containing all cache related metrics
-   */
+  /** Cache metrics keyed by cache region name. */
   cacheMetrics = input<Record<string, CacheMetrics>>();
 
-  /**
-   * Boolean field saying if the metrics are in the process of being updated
-   */
+  /** Whether metrics are currently being refreshed. */
   updating = input<boolean>();
 
   filterNaN = (n: number): number => filterNaN(n);

@@ -13,6 +13,10 @@ import { MetricsModalThreads } from '../metrics-modal-threads/metrics-modal-thre
   templateUrl: './jvm-threads.html',
   imports: [NgbModule, DecimalPipe, TranslateDirective, TranslateModule],
 })
+/**
+ * Displays JVM thread statistics grouped by state (runnable, waiting, blocked).
+ * Clicking the thread dump button opens a modal with full thread details.
+ */
 export class JvmThreads {
   threads = input<Thread[] | undefined>();
 
@@ -47,6 +51,7 @@ export class JvmThreads {
 
   private readonly modalService = inject(NgbModal);
 
+  /** Opens the thread dump modal with full thread details. */
   open(): void {
     const modalRef = this.modalService.open(MetricsModalThreads);
     modalRef.componentInstance.threads = this.threads();

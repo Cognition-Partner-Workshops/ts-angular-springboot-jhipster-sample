@@ -8,6 +8,10 @@ import { mergeMap } from 'rxjs/operators';
 import { IOperation } from '../operation.model';
 import { OperationService } from '../service/operation.service';
 
+/**
+ * Route resolver that pre-fetches an Operation entity before route activation.
+ * Returns null for create routes (no id param) or navigates to 404 if the entity is not found.
+ */
 const operationResolve = (route: ActivatedRouteSnapshot): Observable<null | IOperation> => {
   const id = route.params.id;
   if (id) {

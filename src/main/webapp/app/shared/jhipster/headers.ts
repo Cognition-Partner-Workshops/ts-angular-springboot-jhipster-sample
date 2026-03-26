@@ -37,6 +37,7 @@ const headerToString = (headerValue: any): string | undefined => {
 const decodeHeaderValue = (headerValue?: string): string | undefined =>
   headerValue ? decodeURIComponent(headerValue.replaceAll('+', ' ')) : headerValue;
 
+/** Extracts alert/error messages and entity parameters from JHipster custom HTTP headers. */
 export const getMessageFromHeaders = (headers: Record<string, any>): HeaderMessage => {
   const alertHeader = headerToString(headers[MESSAGE_ALERT_HEADER_NAME]);
   // Try to determine if the alertHeader is a key or a message

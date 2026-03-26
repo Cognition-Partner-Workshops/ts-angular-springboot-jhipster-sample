@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+/** Routes for error pages (generic, 403 access denied, 404 not found) and the catch-all redirect. */
 export const errorRoute: Routes = [
   {
     path: 'error',

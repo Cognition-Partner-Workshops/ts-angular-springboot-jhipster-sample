@@ -7,6 +7,14 @@ import { AccountService } from 'app/core/auth/account.service';
 
 import { StateStorageService } from './state-storage.service';
 
+/**
+ * Functional route guard that protects routes requiring authentication.
+ *
+ * If the user is authenticated and holds one of the required authorities
+ * (defined in `route.data.authorities`), access is granted. Otherwise:
+ * - Unauthenticated users are redirected to /login (current URL is stored for redirect-back).
+ * - Authenticated users without the required role are sent to /accessdenied.
+ */
 export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const accountService = inject(AccountService);
   const router = inject(Router);

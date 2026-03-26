@@ -1,3 +1,4 @@
+/** Raw JSON response from the `/management/info` endpoint. */
 export interface InfoResponse {
   'display-ribbon-on-profiles'?: string;
   git?: any;
@@ -5,6 +6,7 @@ export interface InfoResponse {
   activeProfiles?: string[];
 }
 
+/** Derived profile metadata used by layout components. */
 export class ProfileInfo {
   constructor(
     public activeProfiles?: string[],

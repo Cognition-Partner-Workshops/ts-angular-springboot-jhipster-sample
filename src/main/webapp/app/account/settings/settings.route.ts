@@ -4,6 +4,7 @@ import { UserRouteAccessService } from 'app/core/auth/user-route-access.service'
 
 import Settings from './settings';
 
+/** Route definition for the profile settings page (requires authentication). */
 const settingsRoute: Route = {
   path: 'settings',
   component: Settings,

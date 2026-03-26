@@ -15,7 +15,15 @@ import { TranslateDirective } from 'app/shared/language';
   styleUrl: './home.scss',
   imports: [TranslateDirective, TranslateModule, RouterLink],
 })
+/**
+ * Application home page.
+ *
+ * Displays a welcome message and login prompt for unauthenticated users,
+ * or a personalized greeting for authenticated users. Subscribes to
+ * authentication state changes to update the view reactively.
+ */
 export default class Home implements OnInit, OnDestroy {
+  /** Current account, null when unauthenticated. */
   account = signal<Account | null>(null);
 
   private readonly destroy$ = new Subject<void>();
@@ -30,6 +38,7 @@ export default class Home implements OnInit, OnDestroy {
       .subscribe(account => this.account.set(account));
   }
 
+  /** Navigates to the login page. */
   login(): void {
     this.router.navigate(['/login']);
   }

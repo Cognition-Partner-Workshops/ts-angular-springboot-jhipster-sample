@@ -32,6 +32,10 @@ import { AuthorityService, EntityArrayResponseType } from '../service/authority.
     TranslateModule,
   ],
 })
+/**
+ * Admin list view for Authority (role) entities.
+ * Displays a sortable table with create, view, and delete actions.
+ */
 export class Authority implements OnInit {
   subscription: Subscription | null = null;
   authorities = signal<IAuthority[]>([]);

@@ -13,6 +13,7 @@ import { PasswordResetInitService } from './password-reset-init.service';
   imports: [TranslateDirective, TranslateModule, AlertError, ReactiveFormsModule],
   templateUrl: './password-reset-init.html',
 })
+/** Form for initiating a password reset by entering the account's email address. */
 export default class PasswordResetInit implements AfterViewInit {
   email = viewChild.required<ElementRef>('email');
 
@@ -32,6 +33,7 @@ export default class PasswordResetInit implements AfterViewInit {
     this.email().nativeElement.focus();
   }
 
+  /** Sends the email address to the server to trigger a password reset email. */
   requestReset(): void {
     this.passwordResetInitService.save(this.resetRequestForm.get(['email'])!.value).subscribe({
       next: () => this.success.set(true),

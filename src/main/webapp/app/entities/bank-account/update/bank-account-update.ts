@@ -23,6 +23,13 @@ import { BankAccountFormGroup, BankAccountFormService } from './bank-account-for
   templateUrl: './bank-account-update.html',
   imports: [TranslateDirective, TranslateModule, NgbModule, FontAwesomeModule, AlertError, ReactiveFormsModule],
 })
+/**
+ * Create/edit form for BankAccount entities.
+ *
+ * In create mode (no route id), submits via POST.
+ * In edit mode, pre-fills the form and submits via PUT.
+ * Loads user options for the owner dropdown.
+ */
 export class BankAccountUpdate implements OnInit {
   isSaving = signal(false);
   bankAccount: IBankAccount | null = null;
@@ -54,6 +61,7 @@ export class BankAccountUpdate implements OnInit {
     globalThis.history.back();
   }
 
+  /** Saves the form: creates a new entity or updates an existing one. */
   save(): void {
     this.isSaving.set(true);
     const bankAccount = this.bankAccountFormService.getBankAccount(this.editForm);

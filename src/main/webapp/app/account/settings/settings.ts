@@ -16,6 +16,7 @@ const initialAccount: Account = {} as Account;
   imports: [TranslateDirective, TranslateModule, FindLanguageFromKeyPipe, AlertError, ReactiveFormsModule],
   templateUrl: './settings.html',
 })
+/** Profile settings page allowing users to update their name, email, and preferred language. */
 export default class Settings implements OnInit {
   success = signal(false);
   languages = LANGUAGES;
@@ -52,6 +53,7 @@ export default class Settings implements OnInit {
     });
   }
 
+  /** Persists settings changes, updates the local identity, and switches language if changed. */
   save(): void {
     this.success.set(false);
 

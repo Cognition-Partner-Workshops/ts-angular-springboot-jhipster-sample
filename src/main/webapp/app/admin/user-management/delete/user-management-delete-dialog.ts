@@ -15,16 +15,19 @@ import { User } from '../user-management.model';
   templateUrl: './user-management-delete-dialog.html',
   imports: [TranslateDirective, TranslateModule, FontAwesomeModule, AlertError, FormsModule],
 })
+/** Modal dialog confirming deletion of an admin user account. */
 export default class UserManagementDeleteDialog {
   user?: User;
 
   private readonly userService = inject(UserManagementService);
   private readonly activeModal = inject(NgbActiveModal);
 
+  /** Dismisses the dialog without deleting. */
   cancel(): void {
     this.activeModal.dismiss();
   }
 
+  /** Deletes the user by login and closes the dialog. */
   confirmDelete(login: string): void {
     this.userService.delete(login).subscribe(() => {
       this.activeModal.close('deleted');
