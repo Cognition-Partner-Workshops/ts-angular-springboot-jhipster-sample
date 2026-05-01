@@ -11,8 +11,8 @@ import {
 describe('Authentication Flows e2e test', () => {
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const adminUsername = Cypress.env('E2E_USERNAME') ?? 'admin';
-  const adminPassword = Cypress.env('E2E_PASSWORD') ?? 'admin';
+  const adminUsername = Cypress.env('E2E_ADMIN_USERNAME') ?? 'admin';
+  const adminPassword = Cypress.env('E2E_ADMIN_PASSWORD') ?? 'admin';
 
   beforeEach(() => {
     cy.intercept('POST', '/api/authenticate').as('authenticate');
