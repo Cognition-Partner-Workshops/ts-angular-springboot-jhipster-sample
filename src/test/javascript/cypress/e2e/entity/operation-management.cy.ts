@@ -51,11 +51,15 @@ describe('Operation Management e2e test', () => {
       cy.getEntityCreateUpdateHeading('Operation');
     });
 
-    it('should mark date field as required', () => {
-      cy.get(`[data-cy="date"]`).should('have.class', classInvalid);
-      cy.get(`[data-cy="date"]`).type('2024-01-15T10:30');
-      cy.get(`[data-cy="date"]`).blur();
+    it('should have date field pre-populated with current time and valid', () => {
       cy.get(`[data-cy="date"]`).should('have.class', classValid);
+      cy.get(`[data-cy="date"]`).invoke('val').should('not.be.empty');
+    });
+
+    it('should mark date field invalid when cleared', () => {
+      cy.get(`[data-cy="date"]`).clear();
+      cy.get(`[data-cy="date"]`).blur();
+      cy.get(`[data-cy="date"]`).should('have.class', classInvalid);
     });
 
     it('should mark amount field as required', () => {
@@ -144,7 +148,7 @@ describe('Operation Management e2e test', () => {
       cy.get(`[data-cy="date"]`).blur();
       cy.get(`[data-cy="description"]`).type('Categorized transaction');
       cy.get(`[data-cy="amount"]`).type('250.00');
-      cy.setFieldSelectToLastOfEntity('labels');
+      cy.setFieldSelectToLastOfEntity('label');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

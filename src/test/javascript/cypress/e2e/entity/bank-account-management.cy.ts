@@ -75,7 +75,7 @@ describe('BankAccount Management e2e test', () => {
 
         cy.visit(`${bankAccountPageUrl}/${bankAccount.id}/view`);
         cy.getEntityDetailsHeading('bankAccount');
-        cy.get('[data-cy="bankAccountDetails"]').should('exist');
+        cy.get('[data-cy="bankAccountDetailsHeading"]').should('exist');
         cy.get(entityDetailsBackButtonSelector).click();
         cy.url().should('match', bankAccountPageUrlPattern);
       });
