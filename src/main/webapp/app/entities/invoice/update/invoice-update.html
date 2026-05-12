@@ -1,0 +1,156 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-invoice-heading"
+        data-cy="InvoiceCreateUpdateHeading"
+        jhiTranslate="jhipsterSampleApplicationApp.invoice.home.createOrEditLabel"
+      >
+        Create or edit a Invoice
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="jhipsterSampleApplicationApp.invoice.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let numberRef = editForm.get('number')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_number" jhiTranslate="jhipsterSampleApplicationApp.invoice.number">Number</label>
+          <input type="text" class="form-control" name="number" id="field_number" data-cy="number" formControlName="number" />
+          @if (numberRef.invalid && (numberRef.dirty || numberRef.touched)) {
+            <div>
+              @if (editForm.get('number')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateRef = editForm.get('date')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_date" jhiTranslate="jhipsterSampleApplicationApp.invoice.date">Date</label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              name="date"
+              id="field_date"
+              data-cy="date"
+              formControlName="date"
+              ngbDatepicker
+              #dateDp="ngbDatepicker"
+            />
+            <button type="button" (click)="dateDp.toggle()" class="btn btn-secondary">
+              <fa-icon icon="calendar-alt" />
+            </button>
+          </div>
+          @if (dateRef.invalid && (dateRef.dirty || dateRef.touched)) {
+            <div>
+              @if (editForm.get('date')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dueDateRef = editForm.get('dueDate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dueDate" jhiTranslate="jhipsterSampleApplicationApp.invoice.dueDate">Due Date</label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              name="dueDate"
+              id="field_dueDate"
+              data-cy="dueDate"
+              formControlName="dueDate"
+              ngbDatepicker
+              #dueDateDp="ngbDatepicker"
+            />
+            <button type="button" (click)="dueDateDp.toggle()" class="btn btn-secondary">
+              <fa-icon icon="calendar-alt" />
+            </button>
+          </div>
+          @if (dueDateRef.invalid && (dueDateRef.dirty || dueDateRef.touched)) {
+            <div>
+              @if (editForm.get('dueDate')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let amountRef = editForm.get('amount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_amount" jhiTranslate="jhipsterSampleApplicationApp.invoice.amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+          @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+            <div>
+              @if (editForm.get('amount')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('amount')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_status" jhiTranslate="jhipsterSampleApplicationApp.invoice.status">Status</label>
+          <select class="form-control" name="status" id="field_status" data-cy="status" formControlName="status">
+            <option [ngValue]="null" jhiTranslate="jhipsterSampleApplicationApp.invoice.statusPlaceholder">Select a status</option>
+            <option value="DRAFT" jhiTranslate="jhipsterSampleApplicationApp.InvoiceStatus.DRAFT">DRAFT</option>
+            <option value="SENT" jhiTranslate="jhipsterSampleApplicationApp.InvoiceStatus.SENT">SENT</option>
+            <option value="PAID" jhiTranslate="jhipsterSampleApplicationApp.InvoiceStatus.PAID">PAID</option>
+            <option value="OVERDUE" jhiTranslate="jhipsterSampleApplicationApp.InvoiceStatus.OVERDUE">OVERDUE</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_bankAccount" jhiTranslate="jhipsterSampleApplicationApp.invoice.bankAccount"
+            >Bank Account</label
+          >
+          <select
+            class="form-control"
+            id="field_bankAccount"
+            data-cy="bankAccount"
+            name="bankAccount"
+            formControlName="bankAccount"
+            [compareWith]="compareBankAccount"
+          >
+            <option [ngValue]="null"></option>
+            @for (bankAccountOption of bankAccountsSharedCollection(); track $index) {
+              <option [ngValue]="bankAccountOption">{{ bankAccountOption.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
