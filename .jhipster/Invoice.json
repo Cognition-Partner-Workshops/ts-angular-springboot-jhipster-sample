@@ -1,0 +1,53 @@
+{
+  "annotations": {
+    "changelogDate": "20260512142800"
+  },
+  "changelogDate": "20260512142800",
+  "dto": "no",
+  "entityTableName": "invoice",
+  "fields": [
+    {
+      "fieldId": 1,
+      "fieldName": "number",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldId": 2,
+      "fieldName": "date",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldId": 3,
+      "fieldName": "dueDate",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldId": 4,
+      "fieldName": "amount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldId": 5,
+      "fieldName": "status",
+      "fieldType": "InvoiceStatus",
+      "fieldValues": "DRAFT,SENT,PAID,OVERDUE",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Invoice",
+  "pagination": "no",
+  "relationships": [
+    {
+      "otherEntityName": "bankAccount",
+      "relationshipId": 1,
+      "relationshipName": "bankAccount",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}
