@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (invoice(); as invoiceRef) {
+      <div>
+        <h2 data-cy="invoiceDetailsHeading">
+          <span jhiTranslate="jhipsterSampleApplicationApp.invoice.detail.title">Invoice</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ invoiceRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.number">Number</span></dt>
+          <dd>
+            <span>{{ invoiceRef.number }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.date">Date</span></dt>
+          <dd>
+            <span>{{ invoiceRef.date }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.dueDate">Due Date</span></dt>
+          <dd>
+            <span>{{ invoiceRef.dueDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.amount">Amount</span></dt>
+          <dd>
+            <span>{{ invoiceRef.amount }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.status">Status</span></dt>
+          <dd>
+            <span jhiTranslate="{{ 'jhipsterSampleApplicationApp.InvoiceStatus.' + (invoiceRef.status ?? 'null') }}">{{
+              invoiceRef.status
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="jhipsterSampleApplicationApp.invoice.bankAccount">Bank Account</span></dt>
+          <dd>
+            @if (invoiceRef.bankAccount) {
+              <div>
+                <a [routerLink]="['/bank-account', invoiceRef.bankAccount.id, 'view']">{{ invoiceRef.bankAccount.name }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/invoice', invoiceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
