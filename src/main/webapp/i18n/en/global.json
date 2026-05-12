@@ -11,7 +11,8 @@
         "adminAuthority": "Authority",
         "bankAccount": "Bank Account",
         "label": "Label",
-        "operation": "Operation"
+        "operation": "Operation",
+        "invoice": "Invoice"
       },
       "account": {
         "main": "Account",
