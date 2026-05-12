@@ -51,7 +51,7 @@ public class Invoice implements Serializable {
     private InvoiceStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "operations" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "user", "operations" }, allowSetters = true)
     private BankAccount bankAccount;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

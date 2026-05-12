@@ -87,6 +87,17 @@ public class InvoiceService {
     @Transactional(readOnly = true)
     public List<Invoice> findAll() {
         LOG.debug("Request to get all Invoices");
+        return invoiceRepository.findAll();
+    }
+
+    /**
+     * Get all the invoices with eager relationships.
+     *
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public List<Invoice> findAllWithEagerRelationships() {
+        LOG.debug("Request to get all Invoices with eager relationships");
         return invoiceRepository.findAllWithEagerRelationships();
     }
 
