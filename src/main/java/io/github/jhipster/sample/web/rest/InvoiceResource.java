@@ -139,7 +139,7 @@ public class InvoiceResource {
     @GetMapping("")
     public List<Invoice> getAllInvoices(@RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
         LOG.debug("REST request to get all Invoices");
-        return invoiceService.findAll();
+        return invoiceService.findAll(eagerload);
     }
 
     /**
