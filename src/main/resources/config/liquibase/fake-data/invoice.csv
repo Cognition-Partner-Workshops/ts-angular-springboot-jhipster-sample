@@ -1,0 +1,4 @@
+id;invoice_number;invoice_date;due_date;amount;status
+1;INV-001;2025-01-15;2025-02-15;1500.00;DRAFT
+2;INV-002;2025-02-20;2025-03-20;2750.50;SENT
+3;INV-003;2025-03-10;2025-04-10;890.25;PAID

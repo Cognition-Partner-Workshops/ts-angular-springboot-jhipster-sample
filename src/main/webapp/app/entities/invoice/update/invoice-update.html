@@ -1,0 +1,155 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-invoice-heading"
+        data-cy="InvoiceCreateUpdateHeading"
+        jhiTranslate="jhipsterSampleApplicationApp.invoice.home.createOrEditLabel"
+      >
+        Create or edit an Invoice
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="jhipsterSampleApplicationApp.invoice.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let invoiceNumberRef = editForm.get('invoiceNumber')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_invoiceNumber" jhiTranslate="jhipsterSampleApplicationApp.invoice.invoiceNumber"
+            >Invoice Number</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="invoiceNumber"
+            id="field_invoiceNumber"
+            data-cy="invoiceNumber"
+            formControlName="invoiceNumber"
+          />
+          @if (invoiceNumberRef.invalid && (invoiceNumberRef.dirty || invoiceNumberRef.touched)) {
+            <div>
+              @if (editForm.get('invoiceNumber')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let invoiceDateRef = editForm.get('invoiceDate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_invoiceDate" jhiTranslate="jhipsterSampleApplicationApp.invoice.invoiceDate"
+            >Invoice Date</label
+          >
+          <input
+            type="date"
+            class="form-control"
+            name="invoiceDate"
+            id="field_invoiceDate"
+            data-cy="invoiceDate"
+            formControlName="invoiceDate"
+          />
+          @if (invoiceDateRef.invalid && (invoiceDateRef.dirty || invoiceDateRef.touched)) {
+            <div>
+              @if (editForm.get('invoiceDate')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dueDateRef = editForm.get('dueDate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dueDate" jhiTranslate="jhipsterSampleApplicationApp.invoice.dueDate">Due Date</label>
+          <input type="date" class="form-control" name="dueDate" id="field_dueDate" data-cy="dueDate" formControlName="dueDate" />
+          @if (dueDateRef.invalid && (dueDateRef.dirty || dueDateRef.touched)) {
+            <div>
+              @if (editForm.get('dueDate')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let amountRef = editForm.get('amount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_amount" jhiTranslate="jhipsterSampleApplicationApp.invoice.amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+          @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+            <div>
+              @if (editForm.get('amount')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('amount')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status" jhiTranslate="jhipsterSampleApplicationApp.invoice.status">Status</label>
+          <select class="form-control" name="status" id="field_status" data-cy="status" formControlName="status">
+            <option [ngValue]="null">{{ 'jhipsterSampleApplicationApp.invoice.InvoiceStatus.null' | translate }}</option>
+            @for (statusOption of statusValues; track $index) {
+              <option [value]="statusOption">
+                {{ 'jhipsterSampleApplicationApp.invoice.InvoiceStatus.' + statusOption | translate }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (editForm.get('status')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_bankAccount" jhiTranslate="jhipsterSampleApplicationApp.invoice.bankAccount"
+            >Bank Account</label
+          >
+          <select
+            class="form-control"
+            id="field_bankAccount"
+            data-cy="bankAccount"
+            name="bankAccount"
+            formControlName="bankAccount"
+            [compareWith]="compareBankAccount"
+          >
+            <option [ngValue]="null"></option>
+            @for (bankAccountOption of bankAccountsSharedCollection(); track $index) {
+              <option [ngValue]="bankAccountOption">{{ bankAccountOption.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
