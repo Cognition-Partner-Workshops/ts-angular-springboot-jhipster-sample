@@ -16,5 +16,8 @@
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"
                                  />
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="bank_account" constraintName="fk_bank_account__user_id"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

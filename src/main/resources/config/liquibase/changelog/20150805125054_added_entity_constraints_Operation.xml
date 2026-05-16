@@ -30,5 +30,10 @@
                                  referencedColumnNames="id"
                                  referencedTableName="label"
                                  />
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="operation" constraintName="fk_operation__bank_account_id"/>
+            <dropForeignKeyConstraint baseTableName="rel_operation__label" constraintName="fk_rel_operation__label__operation_id"/>
+            <dropForeignKeyConstraint baseTableName="rel_operation__label" constraintName="fk_rel_operation__label__label_id"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

@@ -29,6 +29,9 @@
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
         <dropDefaultValue tableName="operation" columnName="date" columnDataType="${datetimeType}"/>
+        <rollback>
+            <dropTable tableName="operation"/>
+        </rollback>
     </changeSet>
 
     <changeSet id="20150805125054-1-relations" author="jhipster">
@@ -43,6 +46,9 @@
         </createTable>
 
         <addPrimaryKey columnNames="operation_id, label_id" tableName="rel_operation__label"/>
+        <rollback>
+            <dropTable tableName="rel_operation__label"/>
+        </rollback>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
