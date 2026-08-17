@@ -17,6 +17,12 @@ const routes: Routes = [
     outlet: 'navbar',
   },
   {
+    path: 'dashboard',
+    canActivate: [UserRouteAccessService],
+    loadComponent: () => import('./dashboard/dashboard'),
+    title: 'dashboard.title',
+  },
+  {
     path: 'admin',
     data: {
       authorities: [Authority.ADMIN],

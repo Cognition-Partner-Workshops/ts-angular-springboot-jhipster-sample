@@ -1,0 +1,24 @@
+{
+  "dashboard": {
+    "title": "Account summary",
+    "totalBalance": "Total balance",
+    "accountCount": "Accounts",
+    "operationCount": "Operations",
+    "loading": "Loading account summary",
+    "accounts": {
+      "title": "Account balances",
+      "name": "Account",
+      "balance": "Balance",
+      "operationCount": "Operations",
+      "empty": "No accounts found"
+    },
+    "recentOperations": {
+      "title": "Recent operations",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "account": "Account",
+      "empty": "No recent operations found"
+    }
+  }
+}
