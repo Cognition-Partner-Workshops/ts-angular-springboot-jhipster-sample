@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.repository;
 
 import io.github.jhipster.sample.domain.BankAccount;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,33 @@ import org.springframework.stereotype.Repository;
 public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
     @Query("select bankAccount from BankAccount bankAccount where bankAccount.user.login = ?#{authentication.name}")
     List<BankAccount> findByUserIsCurrentUser();
+
+    @Query("select coalesce(sum(bankAccount.balance), 0) from BankAccount bankAccount")
+    BigDecimal sumBalances();
+
+    /**
+     * Projection of a bank account balance together with its number of operations.
+     */
+    interface AccountBalanceProjection {
+        Long getId();
+
+        String getName();
+
+        BigDecimal getBalance();
+
+        long getOperationCount();
+    }
+
+    @Query(
+        """
+        select bankAccount.id as id, bankAccount.name as name, bankAccount.balance as balance, count(operation.id) as operationCount
+        from BankAccount bankAccount
+        left join bankAccount.operations operation
+        group by bankAccount.id, bankAccount.name, bankAccount.balance
+        order by bankAccount.id
+        """
+    )
+    List<AccountBalanceProjection> findBalancesWithOperationCount();
 
     default Optional<BankAccount> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
