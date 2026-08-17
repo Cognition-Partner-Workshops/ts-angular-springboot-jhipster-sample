@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
-import { Router, TitleStrategy } from '@angular/router';
+import { Router, TitleStrategy, provideRouter } from '@angular/router';
 
 import { InterpolatableTranslationObject, LangChangeEvent, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject, of } from 'rxjs';
@@ -27,6 +27,7 @@ describe('Main', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       providers: [
+        provideRouter([]),
         Title,
         {
           provide: AccountService,
