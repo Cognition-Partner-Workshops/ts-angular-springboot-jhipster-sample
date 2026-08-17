@@ -1,0 +1,92 @@
+<div class="dashboard">
+  <h2><span jhiTranslate="dashboard.title">Dashboard</span></h2>
+
+  @if (isLoading()) {
+    <p jhiTranslate="dashboard.loading">Loading dashboard...</p>
+  } @else if (accountSummary(); as summary) {
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="card-title h5" jhiTranslate="dashboard.cards.totalBalance">Total balance</h3>
+            <p class="card-text fs-3">{{ summary.totalBalance | currency }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="card-title h5" jhiTranslate="dashboard.cards.accounts">Accounts</h3>
+            <p class="card-text fs-3">{{ summary.accountCount }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="card-title h5" jhiTranslate="dashboard.cards.operations">Operations</h3>
+            <p class="card-text fs-3">{{ summary.operationCount }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mb-4">
+      <h3 jhiTranslate="dashboard.accounts.title">Account balances</h3>
+      @if (summary.accounts.length > 0) {
+        <div class="table-responsive">
+          <table class="table table-striped" aria-describedby="accounts-heading">
+            <thead>
+              <tr>
+                <th scope="col" jhiTranslate="dashboard.accounts.name">Name</th>
+                <th scope="col" jhiTranslate="dashboard.accounts.balance">Balance</th>
+                <th scope="col" jhiTranslate="dashboard.accounts.operationCount">Operations</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (account of summary.accounts; track account.id) {
+                <tr>
+                  <td>{{ account.name }}</td>
+                  <td>{{ account.balance | currency }}</td>
+                  <td>{{ account.operationCount }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="text-muted" jhiTranslate="dashboard.accounts.empty">No accounts found.</p>
+      }
+    </section>
+
+    <section>
+      <h3 jhiTranslate="dashboard.operations.title">Recent operations</h3>
+      @if (summary.recentOperations.length > 0) {
+        <div class="table-responsive">
+          <table class="table table-striped" aria-describedby="operations-heading">
+            <thead>
+              <tr>
+                <th scope="col" jhiTranslate="dashboard.operations.date">Date</th>
+                <th scope="col" jhiTranslate="dashboard.operations.description">Description</th>
+                <th scope="col" jhiTranslate="dashboard.operations.account">Bank account</th>
+                <th scope="col" jhiTranslate="dashboard.operations.amount">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (operation of summary.recentOperations; track operation.id) {
+                <tr>
+                  <td>{{ operationDate(operation.date) | formatMediumDatetime }}</td>
+                  <td>{{ operation.description }}</td>
+                  <td>{{ operation.bankAccountName }}</td>
+                  <td>{{ operation.amount | currency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="text-muted" jhiTranslate="dashboard.operations.empty">No recent operations found.</p>
+      }
+    </section>
+  }
+</div>
