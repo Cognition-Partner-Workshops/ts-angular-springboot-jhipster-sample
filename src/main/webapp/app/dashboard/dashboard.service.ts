@@ -14,7 +14,10 @@ export class DashboardService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/account-summary');
 
   getAccountSummary(useMock = true): Observable<IAccountSummary> {
-    // TODO: remove mock
+    // TODO: remove mock:
+    // 1. Delete MOCK_ACCOUNT_SUMMARY and the if (useMock) line.
+    // 2. Remove the useMock parameter from this signature.
+    // 3. Update dashboard.spec.ts to call getAccountSummary() without an argument.
     const MOCK_ACCOUNT_SUMMARY: IAccountSummary = {
       totalBalance: 12750.45,
       accountCount: 3,
