@@ -1,3 +1,5 @@
+import dayjs from 'dayjs/esm';
+
 export interface DashboardAccount {
   id: number;
   name: string;
@@ -7,11 +9,15 @@ export interface DashboardAccount {
 
 export interface DashboardOperation {
   id: number;
-  date: string;
+  date: dayjs.Dayjs;
   description: string | null;
   amount: number;
   bankAccountName: string | null;
 }
+
+export type RestDashboardOperation = Omit<DashboardOperation, 'date'> & {
+  date: string;
+};
 
 export interface AccountSummary {
   totalBalance: number;
@@ -20,3 +26,7 @@ export interface AccountSummary {
   accounts: DashboardAccount[];
   recentOperations: DashboardOperation[];
 }
+
+export type RestAccountSummary = Omit<AccountSummary, 'recentOperations'> & {
+  recentOperations: RestDashboardOperation[];
+};

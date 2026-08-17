@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, of } from 'rxjs';
+import dayjs from 'dayjs/esm';
+import { Observable, map, of } from 'rxjs';
 
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
-import { AccountSummary } from './dashboard.model';
+import { AccountSummary, RestAccountSummary } from './dashboard.model';
 
-// TODO(DJ-92): remove mock once /api/account-summary lands
-export const ACCOUNT_SUMMARY_MOCK: AccountSummary | undefined = {
+// TODO(DJ-92): Remove this mock when the endpoint lands: delete ACCOUNT_SUMMARY_MOCK and the useMock parameter.
+// Update dashboard.spec.ts from getSummary(false) to getSummary().
+export const ACCOUNT_SUMMARY_MOCK: RestAccountSummary = {
   totalBalance: 12345.67,
   accountCount: 2,
   operationCount: 3,
@@ -30,6 +32,22 @@ export class DashboardService {
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/account-summary');
 
   getSummary(useMock = true): Observable<AccountSummary> {
-    return useMock && ACCOUNT_SUMMARY_MOCK ? of(ACCOUNT_SUMMARY_MOCK) : this.http.get<AccountSummary>(this.resourceUrl);
+    return useMock
+      ? of(this.convertFromServer(ACCOUNT_SUMMARY_MOCK))
+      : this.http.get<RestAccountSummary>(this.resourceUrl).pipe(map(response => this.convertFromServer(response)));
+  }
+
+  protected convertDateFromServer(date: string): dayjs.Dayjs {
+    return dayjs(date);
+  }
+
+  protected convertFromServer(restSummary: RestAccountSummary): AccountSummary {
+    return {
+      ...restSummary,
+      recentOperations: restSummary.recentOperations.map(operation => ({
+        ...operation,
+        date: this.convertDateFromServer(operation.date),
+      })),
+    };
   }
 }

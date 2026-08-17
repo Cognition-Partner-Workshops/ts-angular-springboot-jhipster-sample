@@ -2,12 +2,11 @@ import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import dayjs from 'dayjs/esm';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { TranslateDirective } from 'app/shared/language';
-import { AccountSummary, DashboardOperation } from './dashboard.model';
+import { AccountSummary } from './dashboard.model';
 import { DashboardService } from './dashboard.service';
 
 @Component({
@@ -23,9 +22,5 @@ export default class Dashboard implements OnInit {
 
   ngOnInit(): void {
     this.dashboardService.getSummary().subscribe(summary => this.summary.set(summary));
-  }
-
-  formatDate(operation: DashboardOperation): dayjs.Dayjs {
-    return dayjs(operation.date);
   }
 }

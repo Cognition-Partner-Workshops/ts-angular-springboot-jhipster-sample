@@ -79,7 +79,7 @@
             <tbody>
               @for (operation of summaryRef.recentOperations; track operation.id) {
                 <tr>
-                  <td>{{ formatDate(operation) | formatMediumDatetime }}</td>
+                  <td>{{ operation.date | formatMediumDatetime }}</td>
                   <td>{{ operation.description }}</td>
                   <td>{{ operation.amount | currency }}</td>
                   <td>{{ operation.bankAccountName }}</td>
