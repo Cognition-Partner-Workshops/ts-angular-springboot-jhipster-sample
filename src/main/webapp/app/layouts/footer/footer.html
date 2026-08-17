@@ -1,4 +1,4 @@
 <footer class="footer">
   <p class="footer-text" jhiTranslate="footer">JHipster Sample Application — © 2026 Cognition Partner Workshops</p>
-  <a class="footer-link" routerLink="/admin/docs" jhiTranslate="footerDocs">Documentation</a>
+  <a *jhiHasAnyAuthority="'ROLE_ADMIN'" class="footer-link" routerLink="/admin/docs" jhiTranslate="footerDocs">Documentation</a>
 </footer>
