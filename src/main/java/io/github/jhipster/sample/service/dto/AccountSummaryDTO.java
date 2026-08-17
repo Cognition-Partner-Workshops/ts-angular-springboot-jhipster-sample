@@ -1,12 +1,13 @@
 package io.github.jhipster.sample.service.dto;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountSummaryDTO {
 
-    private BigDecimal totalBalance = BigDecimal.ZERO.setScale(2);
+    private BigDecimal totalBalance = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
     private long accountCount;
     private long operationCount;
     private List<AccountBalanceDTO> accounts = new ArrayList<>();
@@ -17,7 +18,8 @@ public class AccountSummaryDTO {
     }
 
     public void setTotalBalance(BigDecimal totalBalance) {
-        this.totalBalance = totalBalance == null ? BigDecimal.ZERO.setScale(2) : totalBalance.setScale(2);
+        this.totalBalance =
+            totalBalance == null ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP) : totalBalance.setScale(2, RoundingMode.HALF_UP);
     }
 
     public long getAccountCount() {

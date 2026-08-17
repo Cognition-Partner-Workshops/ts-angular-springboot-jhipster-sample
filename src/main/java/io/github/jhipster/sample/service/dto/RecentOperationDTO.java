@@ -2,6 +2,7 @@ package io.github.jhipster.sample.service.dto;
 
 import io.github.jhipster.sample.domain.Operation;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 
 public class RecentOperationDTO {
@@ -18,7 +19,7 @@ public class RecentOperationDTO {
         this.id = operation.getId();
         this.date = operation.getDate();
         this.description = operation.getDescription();
-        this.amount = operation.getAmount().setScale(2);
+        this.amount = operation.getAmount().setScale(2, RoundingMode.HALF_UP);
         this.bankAccountName = operation.getBankAccount() == null ? null : operation.getBankAccount().getName();
     }
 
@@ -51,7 +52,7 @@ public class RecentOperationDTO {
     }
 
     public void setAmount(BigDecimal amount) {
-        this.amount = amount == null ? null : amount.setScale(2);
+        this.amount = amount == null ? null : amount.setScale(2, RoundingMode.HALF_UP);
     }
 
     public String getBankAccountName() {

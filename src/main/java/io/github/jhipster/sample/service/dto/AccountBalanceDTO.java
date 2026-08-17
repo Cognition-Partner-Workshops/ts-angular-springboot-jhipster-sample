@@ -1,6 +1,7 @@
 package io.github.jhipster.sample.service.dto;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class AccountBalanceDTO {
 
@@ -14,7 +15,7 @@ public class AccountBalanceDTO {
     public AccountBalanceDTO(Long id, String name, BigDecimal balance, long operationCount) {
         this.id = id;
         this.name = name;
-        this.balance = balance.setScale(2);
+        this.balance = balance.setScale(2, RoundingMode.HALF_UP);
         this.operationCount = operationCount;
     }
 
@@ -39,7 +40,7 @@ public class AccountBalanceDTO {
     }
 
     public void setBalance(BigDecimal balance) {
-        this.balance = balance == null ? null : balance.setScale(2);
+        this.balance = balance == null ? null : balance.setScale(2, RoundingMode.HALF_UP);
     }
 
     public long getOperationCount() {
