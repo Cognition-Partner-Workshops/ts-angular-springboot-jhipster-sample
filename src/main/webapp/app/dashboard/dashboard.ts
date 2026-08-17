@@ -1,6 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -13,7 +12,7 @@ import { DashboardService } from './dashboard.service';
   selector: 'jhi-dashboard',
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
-  imports: [CurrencyPipe, FormatMediumDatetimePipe, RouterLink, TranslateDirective, TranslateModule],
+  imports: [CurrencyPipe, FormatMediumDatetimePipe, TranslateDirective, TranslateModule],
 })
 export default class Dashboard implements OnInit {
   summary = signal<AccountSummary | null>(null);
