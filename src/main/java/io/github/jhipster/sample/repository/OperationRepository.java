@@ -1,6 +1,8 @@
 package io.github.jhipster.sample.repository;
 
 import io.github.jhipster.sample.domain.Operation;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -40,4 +42,30 @@ public interface OperationRepository extends OperationRepositoryWithBagRelations
 
     @Query("select operation from Operation operation left join fetch operation.bankAccount where operation.id =:id")
     Optional<Operation> findOneWithToOneRelationships(@Param("id") Long id);
+
+    /**
+     * Projection of an operation together with the name of its owning bank account.
+     */
+    interface RecentOperationProjection {
+        Long getId();
+
+        Instant getDate();
+
+        String getDescription();
+
+        BigDecimal getAmount();
+
+        String getBankAccountName();
+    }
+
+    @Query(
+        """
+        select operation.id as id, operation.date as date, operation.description as description, operation.amount as amount,
+            bankAccount.name as bankAccountName
+        from Operation operation
+        left join operation.bankAccount bankAccount
+        order by operation.date desc, operation.id desc
+        """
+    )
+    List<RecentOperationProjection> findRecentOperations(Pageable pageable);
 }
