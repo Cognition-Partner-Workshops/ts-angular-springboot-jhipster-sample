@@ -42,7 +42,7 @@ describe('Dashboard Service', () => {
   });
 
   it('should retrieve the account summary contract', () => {
-    service.getSummary(false).subscribe(summary => {
+    service.getSummary().subscribe(summary => {
       expect(summary.totalBalance).toBe(12345.67);
       expect(summary.accountCount).toBe(1);
       expect(summary.operationCount).toBe(1);
