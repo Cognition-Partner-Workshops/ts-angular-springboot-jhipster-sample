@@ -5,6 +5,9 @@
     "logged": {
       "message": "You are logged in as user \"{{username}}\"."
     },
+    "dashboard": {
+      "link": "View your dashboard"
+    },
     "question": "If you have any questions on JHipster:",
     "link": {
       "homepage": "JHipster homepage",
