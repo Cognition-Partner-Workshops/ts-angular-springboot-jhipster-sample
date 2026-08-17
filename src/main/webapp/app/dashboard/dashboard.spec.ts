@@ -34,7 +34,7 @@ describe('Dashboard Service', () => {
     };
     let result;
 
-    service.getAccountSummary(false).subscribe(summary => (result = summary));
+    service.getAccountSummary().subscribe(summary => (result = summary));
 
     const request = httpMock.expectOne({ method: 'GET', url: 'api/account-summary' });
     request.flush(payload);
@@ -52,7 +52,7 @@ describe('Dashboard Service', () => {
     };
     let result;
 
-    service.getAccountSummary(false).subscribe(summary => (result = summary));
+    service.getAccountSummary().subscribe(summary => (result = summary));
 
     const request = httpMock.expectOne({ method: 'GET', url: 'api/account-summary' });
     request.flush(payload);
