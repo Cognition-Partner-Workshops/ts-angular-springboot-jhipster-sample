@@ -14,6 +14,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+    @Query("select bankAccount.id, bankAccount.name, bankAccount.balance from BankAccount bankAccount order by bankAccount.id")
+    List<Object[]> findSummaryData();
+
     @Query("select bankAccount from BankAccount bankAccount where bankAccount.user.login = ?#{authentication.name}")
     List<BankAccount> findByUserIsCurrentUser();
 

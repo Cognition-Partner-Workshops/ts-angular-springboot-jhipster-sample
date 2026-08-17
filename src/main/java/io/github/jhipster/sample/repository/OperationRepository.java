@@ -17,6 +17,17 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface OperationRepository extends OperationRepositoryWithBagRelationships, JpaRepository<Operation, Long> {
+    @Query(
+        "select operation.bankAccount.id, count(operation) from Operation operation where operation.bankAccount is not null group by operation.bankAccount.id"
+    )
+    List<Object[]> countByBankAccount();
+
+    @Query("select count(operation) from Operation operation")
+    long countAllOperations();
+
+    @Query("select operation from Operation operation left join fetch operation.bankAccount order by operation.date desc")
+    List<Operation> findRecentOperations(Pageable pageable);
+
     default Optional<Operation> findOneWithEagerRelationships(Long id) {
         return this.fetchBagRelationships(this.findOneWithToOneRelationships(id));
     }
