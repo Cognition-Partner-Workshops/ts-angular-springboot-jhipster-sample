@@ -1,0 +1,30 @@
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+
+/* ==========================================================================
+Footer
+========================================================================== */
+
+.footer {
+  margin-top: 2rem;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid $border-color;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $text-muted;
+
+  .footer-text {
+    margin-bottom: 0.25rem;
+  }
+
+  .footer-link {
+    color: $secondary;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: $body-color;
+      text-decoration: underline;
+    }
+  }
+}
