@@ -49,6 +49,7 @@ jobs:
             target/surefire-reports/**
             target/failsafe-reports/**
             target/site/jacoco/**
+            target/site/jacoco-it/**
           if-no-files-found: warn
           retention-days: 7
 
@@ -80,7 +81,6 @@ jobs:
           name: frontend-test-reports
           path: |
             target/test-results/**
-            coverage/**
           if-no-files-found: warn
           retention-days: 7
 
