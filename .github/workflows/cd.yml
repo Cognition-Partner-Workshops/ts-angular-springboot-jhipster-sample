@@ -1,0 +1,261 @@
+# Deployment pipeline: build a container image with Jib, push it to Amazon ECR and
+# roll it out to Amazon ECS.
+#
+# ############################################################################
+# DEMO NOTICE — every AWS identifier below is a MOCKED PLACEHOLDER.
+# The account id (123456789012), region (us-east-1), role ARNs, ECR repository,
+# ECS cluster (demo-cluster) / namespace (demo-jhipster) and service names do not
+# exist. The workflow is additionally gated so it can never reach real
+# infrastructure by accident:
+#   * it only runs via workflow_dispatch (no automatic trigger),
+#   * DRY_RUN defaults to `true`; every AWS-mutating step is skipped while it is
+#     true and replaced by an echo of the command that would have run,
+#   * a real run additionally requires the repository variable
+#     ENABLE_REAL_DEPLOY to be set to `true` (it is unset in this demo repo).
+# To make this real: set the variables/secrets listed in .github/README.md,
+# replace the placeholders below, and set ENABLE_REAL_DEPLOY=true.
+# ############################################################################
+name: CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      dry_run:
+        description: Mock the deployment (no AWS calls)
+        type: boolean
+        default: true
+      image_tag:
+        description: Image tag to build and deploy (defaults to the commit SHA)
+        type: string
+        required: false
+
+concurrency:
+  # One deployment at a time per environment; deployments are never cancelled midway.
+  group: cd-${{ inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '24.13.0'
+  # MOCK VALUES — replace with real ones for an actual deployment.
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: '123456789012'
+  ECR_REGISTRY: 123456789012.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: demo-jhipster/jhipster-sample-application
+  ECS_CLUSTER: demo-cluster
+  ECS_SERVICE: demo-jhipster-service
+  ECS_CONTAINER_NAME: jhipster-sample-application
+  # Kubernetes/EKS equivalent, kept for reference if the target is EKS instead of ECS.
+  K8S_NAMESPACE: demo-jhipster
+
+jobs:
+  build-image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write # required for OIDC role assumption
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      dry_run: ${{ steps.mode.outputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve run mode
+        id: mode
+        # Real AWS calls need BOTH dry_run=false and the repo variable ENABLE_REAL_DEPLOY=true.
+        run: |
+          if [ "${{ inputs.dry_run }}" = "false" ] && [ "${{ vars.ENABLE_REAL_DEPLOY }}" = "true" ]; then
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Running a REAL deployment to ${{ inputs.environment }}"
+          else
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::DRY RUN — no AWS calls will be made (mocked demo pipeline)"
+          fi
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Compute image reference
+        id: image
+        run: |
+          TAG="${{ inputs.image_tag }}"
+          [ -n "$TAG" ] || TAG="${GITHUB_SHA::12}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      # MOCK ROLE ARN — a real setup points this at an IAM role trusting GitHub's OIDC provider.
+      - name: Configure AWS credentials (OIDC)
+        if: steps.mode.outputs.dry_run == 'false'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/demo-github-actions-deploy
+          role-session-name: gha-cd-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        if: steps.mode.outputs.dry_run == 'false'
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Dry run: build the image into the local Docker daemon so the Jib
+      # configuration is genuinely exercised without any registry push.
+      - name: Build image locally (dry run)
+        if: steps.mode.outputs.dry_run == 'true'
+        run: |
+          ./mvnw -ntp -B verify -DskipTests -Pprod jib:dockerBuild \
+            -Dimage=${{ steps.image.outputs.image }}
+          echo "::notice::[MOCK] would push ${{ steps.image.outputs.image }} to Amazon ECR"
+
+      - name: Build and push image to ECR
+        if: steps.mode.outputs.dry_run == 'false'
+        run: |
+          ./mvnw -ntp -B verify -DskipTests -Pprod jib:build \
+            -Dimage=${{ steps.image.outputs.image }}
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    needs: build-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # GitHub environment: `production` is configured with required reviewers, so a
+    # production deployment pauses here until it is approved.
+    environment:
+      name: ${{ inputs.environment }}
+      url: https://${{ inputs.environment }}.demo-jhipster.example.com
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        if: needs.build-image.outputs.dry_run == 'false'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # MOCK ROLE ARN — per-environment deploy roles.
+          role-to-assume: arn:aws:iam::123456789012:role/demo-github-actions-deploy-${{ inputs.environment }}
+          role-session-name: gha-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Render ECS task definition
+        run: |
+          # MOCK task definition — a real pipeline would download the live one with
+          # `aws ecs describe-task-definition` instead of templating it here.
+          cat > task-definition.json <<'JSON'
+          {
+            "family": "demo-jhipster",
+            "networkMode": "awsvpc",
+            "requiresCompatibilities": ["FARGATE"],
+            "cpu": "1024",
+            "memory": "2048",
+            "executionRoleArn": "arn:aws:iam::123456789012:role/demo-ecs-task-execution",
+            "taskRoleArn": "arn:aws:iam::123456789012:role/demo-ecs-task",
+            "containerDefinitions": [
+              {
+                "name": "jhipster-sample-application",
+                "image": "PLACEHOLDER_IMAGE",
+                "essential": true,
+                "portMappings": [{ "containerPort": 8080, "protocol": "tcp" }],
+                "environment": [
+                  { "name": "SPRING_PROFILES_ACTIVE", "value": "prod,api-docs" },
+                  { "name": "JHIPSTER_SLEEP", "value": "0" }
+                ],
+                "secrets": [
+                  {
+                    "name": "SPRING_DATASOURCE_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:123456789012:secret:demo-jhipster/db-password"
+                  }
+                ],
+                "healthCheck": {
+                  "command": ["CMD-SHELL", "curl -f http://localhost:8080/management/health || exit 1"],
+                  "interval": 30,
+                  "timeout": 5,
+                  "retries": 3,
+                  "startPeriod": 90
+                },
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "/ecs/demo-jhipster",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                  }
+                }
+              }
+            ]
+          }
+          JSON
+
+      - name: Set image in task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ needs.build-image.outputs.image }}
+
+      - name: Mock deployment (dry run)
+        if: needs.build-image.outputs.dry_run == 'true'
+        run: |
+          echo "::notice::[MOCK] aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --task-definition demo-jhipster --force-new-deployment"
+          echo "[MOCK] image        : ${{ needs.build-image.outputs.image }}"
+          echo "[MOCK] environment  : ${{ inputs.environment }}"
+          echo "[MOCK] cluster      : ${ECS_CLUSTER} (region ${AWS_REGION})"
+          echo "[MOCK] EKS variant  : kubectl -n ${K8S_NAMESPACE} set image deployment/jhipster-sample-application app=${{ needs.build-image.outputs.image }}"
+          echo "--- rendered task definition ---"
+          cat "${{ steps.task-def.outputs.task-definition }}"
+          echo "::notice::[MOCK] would wait for the ECS service to reach a steady state"
+
+      - name: Deploy to Amazon ECS
+        if: needs.build-image.outputs.dry_run == 'false'
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
+
+      - name: Smoke test
+        run: |
+          URL="https://${{ inputs.environment }}.demo-jhipster.example.com/management/health"
+          if [ "${{ needs.build-image.outputs.dry_run }}" = "true" ]; then
+            echo "::notice::[MOCK] would curl ${URL} and assert {\"status\":\"UP\"}"
+          else
+            curl --fail --retry 10 --retry-delay 15 --retry-connrefused "$URL"
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "### CD run"
+            echo ""
+            echo "| field | value |"
+            echo "| --- | --- |"
+            echo "| environment | ${{ inputs.environment }} |"
+            echo "| image | \`${{ needs.build-image.outputs.image }}\` |"
+            echo "| mode | ${{ needs.build-image.outputs.dry_run == 'true' && 'DRY RUN (mocked, no AWS calls)' || 'real deployment' }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

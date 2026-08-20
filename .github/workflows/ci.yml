@@ -1,0 +1,148 @@
+# Continuous integration for the JHipster monolith (Java 21 + Spring Boot backend, Angular frontend).
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref (but never cancel a run on main/master).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+permissions:
+  contents: read
+
+env:
+  # Kept in sync with pom.xml: <java.version>21</java.version>, <node.version>v24.13.0</node.version>
+  JAVA_VERSION: '21'
+  NODE_VERSION: '24.13.0'
+
+jobs:
+  # Fast path: compiles backend + frontend without running any test, so obvious
+  # breakage fails within a couple of minutes instead of the full verify cycle.
+  build:
+    name: Build (no tests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Package application (prod profile, tests skipped)
+        run: ./mvnw -ntp -B verify -DskipTests -Pprod
+
+      - name: Upload application jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/*.jar
+          if-no-files-found: error
+          retention-days: 7
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # `./mvnw verify` triggers the frontend build through frontend-maven-plugin,
+      # so the npm dependencies have to be present.
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # Unit tests (surefire) + integration tests (failsafe) + JaCoCo reports.
+      - name: Backend build and tests
+        run: ./mvnw -ntp -B verify
+
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: 'target/surefire-reports/TEST-*.xml,target/failsafe-reports/TEST-*.xml'
+          check_name: Backend test report
+          fail_on_failure: false
+
+      - name: Upload backend test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload JaCoCo coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jacoco-coverage
+          path: target/site/jacoco*/
+          if-no-files-found: warn
+          retention-days: 7
+
+  frontend:
+    name: Frontend lint and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # `npm test` runs `ng test --coverage` (Vitest) and lints via the pretest hook.
+      - name: Unit tests with coverage
+        run: npm test
+
+      - name: Upload frontend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: target/test-results/
+          if-no-files-found: warn
+          retention-days: 7
