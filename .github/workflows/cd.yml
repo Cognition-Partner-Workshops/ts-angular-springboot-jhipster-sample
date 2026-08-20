@@ -1,0 +1,222 @@
+name: CD
+
+# DEMO PIPELINE — every AWS identifier below defaults to an obviously fake value
+# (account 123456789012, role gha-deploy-ts-java-angular-jhipster, cluster
+# demo-staging / demo-prod, ...). While those mock defaults are in use the
+# pipeline runs in DRY RUN mode: the image is built to a local tarball instead
+# of being pushed to ECR, and no ECS API call is made. Replace the repository
+# variables listed in docs/CICD.md with real values to arm the pipeline.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '24.13.0'
+  # Mock AWS coordinates. Override with repository/environment variables.
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID || '123456789012' }}
+  AWS_DEPLOY_ROLE_ARN: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::123456789012:role/gha-deploy-ts-java-angular-jhipster' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'demo/jhipster-sample-application' }}
+
+jobs:
+  # Single source of truth for "are we pointed at real AWS or at the mocks?".
+  configure:
+    name: Resolve deployment mode
+    runs-on: ubuntu-latest
+    outputs:
+      dry_run: ${{ steps.mode.outputs.dry_run }}
+      image_tag: ${{ steps.mode.outputs.image_tag }}
+      registry: ${{ steps.mode.outputs.registry }}
+    steps:
+      - id: mode
+        # Dry run whenever the mock account ID is still configured.
+        run: |
+          if [ "${AWS_ACCOUNT_ID}" = "123456789012" ]; then
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Mock AWS account detected - running in DRY RUN mode (no ECR push, no ECS deploy)."
+          else
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "image_tag=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "registry=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" >> "$GITHUB_OUTPUT"
+
+  build-image:
+    name: Build container image (Jib)
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write # GitHub OIDC -> AWS role assumption (no long-lived keys)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # ---- Real deployments only -------------------------------------------
+      - name: Configure AWS credentials (OIDC)
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-cd-${{ github.run_id }}
+      - name: Log in to Amazon ECR
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+      - name: Build and push image to ECR
+        if: needs.configure.outputs.dry_run == 'false'
+        run: |
+          ./mvnw -ntp --batch-mode -Pprod -DskipTests verify jib:build \
+            "-Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}" \
+            -Djib.to.tags=latest
+
+      # ---- Mock/dry-run path ------------------------------------------------
+      # jib:buildTar writes target/jib-image.tar locally; nothing leaves the runner.
+      - name: Build image to local tarball (dry run)
+        if: needs.configure.outputs.dry_run == 'true'
+        run: |
+          ./mvnw -ntp --batch-mode -Pprod -DskipTests verify jib:buildTar \
+            "-Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}"
+          echo "::notice::DRY RUN - image built locally, not pushed to ${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}"
+      - name: Upload image tarball (dry run)
+        if: needs.configure.outputs.dry_run == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jib-image-tar
+          path: target/jib-image.tar
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy-staging:
+    name: Deploy to staging
+    needs: [configure, build-image]
+    if: github.event_name == 'push' || inputs.environment == 'staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # GitHub Environment "staging": holds the (mock) variables and any reviewers.
+    environment:
+      name: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER_STAGING || 'demo-staging' }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE_STAGING || 'demo-staging-jhipster-sample-application' }}
+      ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_STAGING || 'demo-staging-jhipster-sample-application' }}
+      ECS_CONTAINER_NAME: ${{ vars.ECS_CONTAINER_NAME || 'jhipster-sample-application' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Configure AWS credentials (OIDC)
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-cd-staging-${{ github.run_id }}
+      - name: Render ECS task definition
+        if: needs.configure.outputs.dry_run == 'false'
+        id: taskdef
+        uses: aws-actions/amazon-ecs-render-task-definition@138c24f321fdbdf7edee4a685519d253cae2cdea # v1.9.0
+        with:
+          task-definition-family: ${{ env.ECS_TASK_FAMILY }}
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ needs.configure.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.configure.outputs.image_tag }}
+      - name: Deploy to Amazon ECS
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/amazon-ecs-deploy-task-definition@c465972ecbd160473f22e683363b422a5412a3de # v2.6.3
+        with:
+          task-definition: ${{ steps.taskdef.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
+      - name: Dry-run deployment plan
+        if: needs.configure.outputs.dry_run == 'true'
+        run: |
+          echo "DRY RUN - would deploy to ECS:"
+          echo "  region:  ${AWS_REGION}"
+          echo "  cluster: ${ECS_CLUSTER}"
+          echo "  service: ${ECS_SERVICE}"
+          echo "  image:   ${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}"
+
+  deploy-production:
+    name: Deploy to production
+    needs: [configure, build-image, deploy-staging]
+    # Always runs after staging on push; on manual dispatch it also runs when
+    # production is selected (staging is skipped, hence always() + result check).
+    if: |
+      always() &&
+      needs.build-image.result == 'success' &&
+      (needs.deploy-staging.result == 'success' || needs.deploy-staging.result == 'skipped') &&
+      (github.event_name == 'push' || inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # GitHub Environment "production" must have "Required reviewers" enabled -
+    # that is the manual approval gate between staging and production.
+    environment:
+      name: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER_PRODUCTION || 'demo-prod' }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE_PRODUCTION || 'demo-prod-jhipster-sample-application' }}
+      ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY_PRODUCTION || 'demo-prod-jhipster-sample-application' }}
+      ECS_CONTAINER_NAME: ${{ vars.ECS_CONTAINER_NAME || 'jhipster-sample-application' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Configure AWS credentials (OIDC)
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-cd-production-${{ github.run_id }}
+      - name: Render ECS task definition
+        if: needs.configure.outputs.dry_run == 'false'
+        id: taskdef
+        uses: aws-actions/amazon-ecs-render-task-definition@138c24f321fdbdf7edee4a685519d253cae2cdea # v1.9.0
+        with:
+          task-definition-family: ${{ env.ECS_TASK_FAMILY }}
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ needs.configure.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ needs.configure.outputs.image_tag }}
+      - name: Deploy to Amazon ECS
+        if: needs.configure.outputs.dry_run == 'false'
+        uses: aws-actions/amazon-ecs-deploy-task-definition@c465972ecbd160473f22e683363b422a5412a3de # v2.6.3
+        with:
+          task-definition: ${{ steps.taskdef.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
+      - name: Dry-run deployment plan
+        if: needs.configure.outputs.dry_run == 'true'
+        run: |
+          echo "DRY RUN - would deploy to ECS:"
+          echo "  region:  ${AWS_REGION}"
+          echo "  cluster: ${ECS_CLUSTER}"
+          echo "  service: ${ECS_SERVICE}"
+          echo "  image:   ${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}"
