@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '05:00'
+    open-pull-requests-limit: 5
+    labels: [dependencies, backend]
+    commit-message:
+      prefix: 'deps(maven)'
+    groups:
+      spring:
+        patterns:
+          - 'org.springframework*:*'
+          - 'io.micrometer:*'
+      maven-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '05:00'
+    open-pull-requests-limit: 5
+    labels: [dependencies, frontend]
+    commit-message:
+      prefix: 'deps(npm)'
+    groups:
+      angular:
+        patterns:
+          - '@angular*'
+          - '@angular-*'
+          - 'angular-eslint'
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '05:00'
+    open-pull-requests-limit: 5
+    labels: [dependencies, ci]
+    commit-message:
+      prefix: 'deps(actions)'
+    groups:
+      github-actions:
+        patterns: ['*']

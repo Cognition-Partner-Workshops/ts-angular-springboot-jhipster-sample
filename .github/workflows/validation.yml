@@ -1,0 +1,119 @@
+# Static validation: formatting, code style and dependency vulnerability scanning.
+name: Validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Weekly re-scan so newly published CVEs are surfaced without a code change.
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '24.13.0'
+
+jobs:
+  format:
+    name: Formatting and code style
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # Prettier owns formatting for both the TypeScript sources and (via
+      # prettier-plugin-java) the Java sources; spotless applies the same rules
+      # from Maven, so `spotless:check` catches anything committed unformatted.
+      - name: Prettier check
+        run: npm run prettier:check
+
+      - name: Spotless check
+        run: ./mvnw -ntp -B spotless:check
+
+      # checkstyle.xml in this repo is the JHipster nohttp ruleset.
+      - name: Checkstyle (nohttp)
+        run: ./mvnw -ntp -B checkstyle:check
+
+  dependency-scan:
+    name: Dependency vulnerability scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # Reports only: a transitive CVE in a dependency should not block a PR that
+      # does not touch dependencies. Dependabot (see .github/dependabot.yml) opens
+      # the corresponding upgrade PRs.
+      - name: npm audit (high and above)
+        run: npm audit --audit-level=high || true
+
+      - name: Trivy filesystem scan (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        continue-on-error: true
+        with:
+          sarif_file: trivy-results.sarif
+
+      - name: Upload scan artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-results
+          path: trivy-results.sarif
+          if-no-files-found: warn
+          retention-days: 7

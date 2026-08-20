@@ -275,9 +275,19 @@ docker compose -f src/main/docker/app.yml up -d
 
 For more information refer to [Docker and Docker-Compose](https://www.jhipster.tech/documentation-archive/v9.0.0-beta.3/docker-compose/), this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
 
-## Continuous Integration (optional)
+## Continuous Integration / Continuous Deployment
 
-To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.0.0-beta.3/setting-up-ci/) page for more information.
+GitHub Actions workflows live in [`.github/workflows`](.github/workflows):
+
+- **CI** (`ci.yml`) — on push to `main`/`master` and on pull requests: a build-only fast path, backend build and tests (`./mvnw -ntp verify`, JUnit report + JaCoCo coverage artifacts) and frontend lint + Vitest tests.
+- **Validation** (`validation.yml`) — Prettier / Spotless / Checkstyle (nohttp) checks and a dependency vulnerability scan (`npm audit` + Trivy SARIF).
+- **CD** (`cd.yml`) — Jib image build, push to Amazon ECR and deploy to Amazon ECS via OIDC, targeting the `staging` and `production` GitHub environments. **All AWS values are mocked placeholders and the workflow is dry-run gated**, so it never touches real infrastructure.
+
+Dependency updates are handled by [`.github/dependabot.yml`](.github/dependabot.yml) (maven, npm, github-actions).
+
+See [`.github/README.md`](.github/README.md) for the full description, the mocked-value table and the required secrets/variables.
+
+To generate configuration for other CI systems, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.0.0-beta.3/setting-up-ci/) page for more information.
 
 ## References
 
