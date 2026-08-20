@@ -92,7 +92,7 @@ jobs:
         if: needs.configure.outputs.dry_run == 'false'
         run: |
           ./mvnw -ntp --batch-mode -Pprod -DskipTests verify jib:build \
-            -Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }} \
+            "-Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}" \
             -Djib.to.tags=latest
 
       # ---- Mock/dry-run path ------------------------------------------------
@@ -101,7 +101,7 @@ jobs:
         if: needs.configure.outputs.dry_run == 'true'
         run: |
           ./mvnw -ntp --batch-mode -Pprod -DskipTests verify jib:buildTar \
-            -Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}
+            "-Djib.to.image=${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}:${{ needs.configure.outputs.image_tag }}"
           echo "::notice::DRY RUN - image built locally, not pushed to ${{ needs.configure.outputs.registry }}/${ECR_REPOSITORY}"
       - name: Upload image tarball (dry run)
         if: needs.configure.outputs.dry_run == 'true'
