@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: '21'
+  # Matches <node.version> in pom.xml (frontend-maven-plugin).
+  NODE_VERSION: '24.13.0'
+  MAVEN_OPTS: -Djava.awt.headless=true
+
+jobs:
+  backend:
+    name: Backend build & tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      # -Dskip.installnodenpm -Dskip.npm: the frontend is built and tested in the
+      # `frontend` job, so the Maven build does not need Node.
+      # -Pprod exercises the production profile; integration tests start a
+      # PostgreSQL container through Testcontainers (Docker is available on
+      # ubuntu-latest runners).
+      - name: Build and run unit + integration tests
+        run: ./mvnw -ntp --batch-mode -Dskip.installnodenpm -Dskip.npm -Pprod verify
+      - name: Upload backend test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-test-reports
+          path: |
+            target/surefire-reports/**
+            target/failsafe-reports/**
+            target/site/jacoco/**
+          if-no-files-found: warn
+          retention-days: 7
+
+  frontend:
+    name: Frontend lint, tests & prod build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      # `npm test` is `ng test --coverage` (Vitest); its `pretest` hook re-runs
+      # lint, which is cheap and keeps parity with local runs.
+      - name: Unit tests
+        run: npm test
+      - name: Production build
+        run: npm run webapp:build:prod
+      - name: Upload frontend test reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontend-test-reports
+          path: |
+            target/test-results/**
+            coverage/**
+          if-no-files-found: warn
+          retention-days: 7
+
+  code-quality:
+    name: Code quality & validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+      - name: Set up Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Prettier check
+        run: npm run prettier:check
+      - name: Maven version info
+        run: ./mvnw --version
+      # nohttp checkstyle rules configured in checkstyle.xml.
+      - name: Checkstyle (nohttp)
+        run: ./mvnw -ntp --batch-mode -Dskip.installnodenpm -Dskip.npm checkstyle:check
+      - name: Javadoc
+        run: ./mvnw -ntp --batch-mode -Dskip.installnodenpm -Dskip.npm javadoc:javadoc
+      - name: Validate workflow files (actionlint)
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 # 1.7.12
+        with:
+          args: -color
