@@ -74,4 +74,4 @@ PR volume low.
 Third-party actions are pinned to their major version tag (`actions/checkout@v4`,
 `aws-actions/configure-aws-credentials@v4`, `mikepenz/action-junit-report@v5`, …). The one
 exception is `aquasecurity/trivy-action`, which publishes no major-version tag and is therefore
-pinned to an exact release (`0.28.0`); Dependabot's `github-actions` ecosystem keeps it current.
+pinned to an exact release (`v0.36.0`); Dependabot's `github-actions` ecosystem keeps it current.
